@@ -1,7 +1,7 @@
 import { Redirect } from "expo-router";
 
 export default function Index() {
-  // Redirect to sign-in screen on app start
-  // Change this to '/home' if you want to skip authentication
-  return <Redirect href="/sign-in" />;
+  // Redirect to tabs (home) on app start
+  // Change this to '/sign-in' if you want authentication first
+  return <Redirect href="/(tabs)/home" />;
 }

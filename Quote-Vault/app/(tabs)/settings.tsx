@@ -11,9 +11,9 @@ import {
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme, AccentColor, TextSize } from "../contexts/ThemeContext";
+import { useTheme, AccentColor, TextSize } from "../../contexts/ThemeContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Toggle } from "../components/ui/Toggle";
+import { Toggle } from "../../components/ui/Toggle";
 
 const accentColors: { name: AccentColor; color: string }[] = [
   { name: "blue", color: "#007AFF" },
@@ -126,6 +126,7 @@ export default function SettingsScreen() {
                 backgroundColor: colors.accent,
               },
             ]}
+            onPress={() => router.push("/profile" as any)}
           >
             <Text style={styles.editButtonText}>Edit Profile</Text>
           </TouchableOpacity>
@@ -369,8 +370,58 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        {/* Account/Legal Section */}
+        {/* Account Section */}
         <View style={styles.section}>
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: colors.textSecondary,
+                fontSize: sectionTitleFontSize,
+              },
+            ]}
+          >
+            ACCOUNT
+          </Text>
+          <TouchableOpacity
+            style={styles.settingRow}
+            onPress={() => router.push("/profile" as any)}
+          >
+            <View style={styles.settingLeft}>
+              <Ionicons name="person-outline" size={20} color={colors.text} />
+              <Text
+                style={[
+                  styles.settingLabel,
+                  {
+                    color: colors.text,
+                    fontSize: labelFontSize,
+                  },
+                ]}
+              >
+                Profile
+              </Text>
+            </View>
+            <Ionicons
+              name="chevron-forward"
+              size={20}
+              color={colors.textSecondary}
+            />
+          </TouchableOpacity>
+        </View>
+
+        {/* Legal Section */}
+        <View style={styles.section}>
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: colors.textSecondary,
+                fontSize: sectionTitleFontSize,
+              },
+            ]}
+          >
+            LEGAL
+          </Text>
           <TouchableOpacity style={styles.settingRow}>
             <Text
               style={[

@@ -43,6 +43,8 @@ export default function CustomizeQuoteScreen() {
   const currentBackground = backgrounds.find(
     (bg) => bg.name === selectedBackground
   );
+  const gradientColors = (currentBackground?.colors ||
+    backgrounds[0].colors) as [string, string, ...string[]];
 
   const quoteFontSize =
     textSize === "small" ? 24 : textSize === "large" ? 32 : 28;
@@ -92,7 +94,7 @@ export default function CustomizeQuoteScreen() {
         {/* Quote Display */}
         <View style={styles.quoteDisplayContainer}>
           <LinearGradient
-            colors={currentBackground?.colors || backgrounds[0].colors}
+            colors={gradientColors}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.quoteDisplay}
@@ -168,7 +170,7 @@ export default function CustomizeQuoteScreen() {
                 style={styles.backgroundItem}
               >
                 <LinearGradient
-                  colors={bg.colors}
+                  colors={bg.colors as [string, string, ...string[]]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                   style={[

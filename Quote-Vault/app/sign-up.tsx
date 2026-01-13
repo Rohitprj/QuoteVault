@@ -103,7 +103,7 @@ export default function SignUpScreen() {
 
             <Button
               title="Create Account"
-              onPress={() => router.push("/home")}
+              onPress={() => router.push("/(tabs)/home")}
               variant="primary"
               size="large"
               style={styles.createButton}

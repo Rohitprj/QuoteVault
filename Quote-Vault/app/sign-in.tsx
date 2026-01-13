@@ -111,7 +111,7 @@ export default function SignInScreen() {
 
             <Button
               title="Sign In"
-              onPress={() => router.push("/home")}
+              onPress={() => router.push("/(tabs)/home")}
               variant="primary"
               size="large"
               style={styles.signInButton}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,43 +6,48 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../contexts/ThemeContext';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Button } from '../components/ui/Button';
+} from "react-native";
+import { useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "../contexts/ThemeContext";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Button } from "../components/ui/Button";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 const quoteDisplayWidth = width - 40;
 
-type BackgroundStyle = 'modern' | 'nature' | 'majestic' | 'abstract';
-type FontStyle = 'modern' | 'classic' | 'elegant' | 'minimal';
+type BackgroundStyle = "modern" | "nature" | "majestic" | "abstract";
+type FontStyle = "modern" | "classic" | "elegant" | "minimal";
 
 const backgrounds: { name: BackgroundStyle; colors: string[] }[] = [
-  { name: 'modern', colors: ['#FF6B6B', '#FF8E53', '#FF6B9D', '#C44569'] },
-  { name: 'nature', colors: ['#2C3E50', '#34495E', '#7F8C8D', '#95A5A6'] },
-  { name: 'majestic', colors: ['#667EEA', '#764BA2', '#F093FB', '#4FACFE'] },
-  { name: 'abstract', colors: ['#FFE5B4', '#FFCCCB', '#E6E6FA', '#F0E68C'] },
+  { name: "modern", colors: ["#FF6B6B", "#FF8E53", "#FF6B9D", "#C44569"] },
+  { name: "nature", colors: ["#2C3E50", "#34495E", "#7F8C8D", "#95A5A6"] },
+  { name: "majestic", colors: ["#667EEA", "#764BA2", "#F093FB", "#4FACFE"] },
+  { name: "abstract", colors: ["#FFE5B4", "#FFCCCB", "#E6E6FA", "#F0E68C"] },
 ];
 
 export default function CustomizeQuoteScreen() {
   const router = useRouter();
   const { colors, textSize } = useTheme();
   const insets = useSafeAreaInsets();
-  const [selectedBackground, setSelectedBackground] = useState<BackgroundStyle>('modern');
-  const [selectedFont, setSelectedFont] = useState<FontStyle>('modern');
+  const [selectedBackground, setSelectedBackground] =
+    useState<BackgroundStyle>("modern");
+  const [selectedFont, setSelectedFont] = useState<FontStyle>("modern");
   const [isLiked, setIsLiked] = useState(false);
 
-  const quote = 'The only way to do\ngreat work is to love\nwhat you do.';
-  const author = 'STEVE JOBS';
+  const quote = "The only way to do\ngreat work is to love\nwhat you do.";
+  const author = "STEVE JOBS";
 
-  const currentBackground = backgrounds.find((bg) => bg.name === selectedBackground);
+  const currentBackground = backgrounds.find(
+    (bg) => bg.name === selectedBackground
+  );
 
-  const quoteFontSize = textSize === 'small' ? 24 : textSize === 'large' ? 32 : 28;
-  const authorFontSize = textSize === 'small' ? 12 : textSize === 'large' ? 16 : 14;
+  const quoteFontSize =
+    textSize === "small" ? 24 : textSize === "large" ? 32 : 28;
+  const authorFontSize =
+    textSize === "small" ? 12 : textSize === "large" ? 16 : 14;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -57,7 +62,10 @@ export default function CustomizeQuoteScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
           <Text
@@ -65,7 +73,8 @@ export default function CustomizeQuoteScreen() {
               styles.headerTitle,
               {
                 color: colors.text,
-                fontSize: textSize === 'small' ? 18 : textSize === 'large' ? 24 : 20,
+                fontSize:
+                  textSize === "small" ? 18 : textSize === "large" ? 24 : 20,
               },
             ]}
           >
@@ -73,7 +82,7 @@ export default function CustomizeQuoteScreen() {
           </Text>
           <TouchableOpacity onPress={() => setIsLiked(!isLiked)}>
             <Ionicons
-              name={isLiked ? 'heart' : 'heart-outline'}
+              name={isLiked ? "heart" : "heart-outline"}
               size={24}
               color={isLiked ? colors.accent : colors.text}
             />
@@ -134,17 +143,24 @@ export default function CustomizeQuoteScreen() {
                 styles.sectionTitle,
                 {
                   color: colors.text,
-                  fontSize: textSize === 'small' ? 16 : textSize === 'large' ? 22 : 18,
+                  fontSize:
+                    textSize === "small" ? 16 : textSize === "large" ? 22 : 18,
                 },
               ]}
             >
               Background
             </Text>
             <TouchableOpacity>
-              <Text style={[styles.viewAll, { color: colors.accent }]}>View All</Text>
+              <Text style={[styles.viewAll, { color: colors.accent }]}>
+                View All
+              </Text>
             </TouchableOpacity>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.backgrounds}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.backgrounds}
+          >
             {backgrounds.map((bg) => (
               <TouchableOpacity
                 key={bg.name}
@@ -168,7 +184,12 @@ export default function CustomizeQuoteScreen() {
                     styles.backgroundLabel,
                     {
                       color: colors.text,
-                      fontSize: textSize === 'small' ? 12 : textSize === 'large' ? 16 : 14,
+                      fontSize:
+                        textSize === "small"
+                          ? 12
+                          : textSize === "large"
+                          ? 16
+                          : 14,
                     },
                   ]}
                 >
@@ -186,7 +207,8 @@ export default function CustomizeQuoteScreen() {
               styles.sectionTitle,
               {
                 color: colors.text,
-                fontSize: textSize === 'small' ? 16 : textSize === 'large' ? 22 : 18,
+                fontSize:
+                  textSize === "small" ? 16 : textSize === "large" ? 22 : 18,
                 marginBottom: 16,
               },
             ]}
@@ -194,32 +216,39 @@ export default function CustomizeQuoteScreen() {
             Font Style
           </Text>
           <View style={styles.fontStyles}>
-            {(['modern', 'classic', 'elegant', 'minimal'] as FontStyle[]).map((font) => (
-              <TouchableOpacity
-                key={font}
-                onPress={() => setSelectedFont(font)}
-                style={[
-                  styles.fontStyleButton,
-                  {
-                    backgroundColor:
-                      selectedFont === font ? colors.accent : colors.surface,
-                    borderColor: colors.border,
-                  },
-                ]}
-              >
-                <Text
+            {(["modern", "classic", "elegant", "minimal"] as FontStyle[]).map(
+              (font) => (
+                <TouchableOpacity
+                  key={font}
+                  onPress={() => setSelectedFont(font)}
                   style={[
-                    styles.fontStyleText,
+                    styles.fontStyleButton,
                     {
-                      color: selectedFont === font ? '#FFFFFF' : colors.text,
-                      fontSize: textSize === 'small' ? 12 : textSize === 'large' ? 16 : 14,
+                      backgroundColor:
+                        selectedFont === font ? colors.accent : colors.surface,
+                      borderColor: colors.border,
                     },
                   ]}
                 >
-                  {font.charAt(0).toUpperCase() + font.slice(1)}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                  <Text
+                    style={[
+                      styles.fontStyleText,
+                      {
+                        color: selectedFont === font ? "#FFFFFF" : colors.text,
+                        fontSize:
+                          textSize === "small"
+                            ? 12
+                            : textSize === "large"
+                            ? 16
+                            : 14,
+                      },
+                    ]}
+                  >
+                    {font.charAt(0).toUpperCase() + font.slice(1)}
+                  </Text>
+                </TouchableOpacity>
+              )
+            )}
           </View>
         </View>
 
@@ -253,9 +282,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 20,
@@ -264,7 +293,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   headerTitle: {
-    fontWeight: '700',
+    fontWeight: "700",
   },
   quoteDisplayContainer: {
     paddingHorizontal: 20,
@@ -275,77 +304,77 @@ const styles = StyleSheet.create({
     height: 400,
     borderRadius: 20,
     padding: 24,
-    position: 'relative',
-    overflow: 'hidden',
+    position: "relative",
+    overflow: "hidden",
   },
   quoteDisplayHeader: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+    flexDirection: "row",
+    justifyContent: "flex-end",
     marginBottom: 20,
   },
   quoteDisplayIcons: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
   },
   quoteDisplayIcon: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
   },
   quoteContent: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   quoteText: {
-    color: '#FFFFFF',
-    fontStyle: 'italic',
-    fontWeight: '400',
+    color: "#FFFFFF",
+    fontStyle: "italic",
+    fontWeight: "400",
     marginBottom: 20,
   },
   authorContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   authorLine: {
     width: 24,
     height: 2,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     marginRight: 8,
     opacity: 0.8,
   },
   authorText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
+    color: "#FFFFFF",
+    fontWeight: "600",
     letterSpacing: 1,
   },
   quoteMarks: {
-    position: 'absolute',
+    position: "absolute",
     top: 40,
     left: 20,
   },
   quoteMark: {
     fontSize: 80,
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     opacity: 0.3,
-    fontWeight: '300',
+    fontWeight: "300",
   },
   section: {
     paddingHorizontal: 20,
     marginBottom: 32,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 16,
   },
   sectionTitle: {
-    fontWeight: '700',
+    fontWeight: "700",
   },
   viewAll: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   backgrounds: {
     marginHorizontal: -20,
@@ -353,7 +382,7 @@ const styles = StyleSheet.create({
   },
   backgroundItem: {
     marginRight: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
   backgroundThumbnail: {
     width: 80,
@@ -362,11 +391,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   backgroundLabel: {
-    fontWeight: '500',
+    fontWeight: "500",
   },
   fontStyles: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 12,
   },
   fontStyleButton: {
@@ -376,10 +405,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   fontStyleText: {
-    fontWeight: '600',
+    fontWeight: "600",
   },
   actionButtons: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingHorizontal: 20,
     gap: 12,
     marginBottom: 20,

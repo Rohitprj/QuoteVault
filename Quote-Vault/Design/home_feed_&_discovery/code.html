@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Home Feed &amp; Discovery</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1349ec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101522",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-900 dark:text-white antialiased">
+<!-- Main Container (Mobile Form Factor) -->
+<div class="relative mx-auto min-h-screen max-w-[430px] bg-background-light dark:bg-background-dark shadow-2xl overflow-x-hidden pb-24">
+<!-- Top App Bar -->
+<header class="sticky top-0 z-30 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
+<div class="flex items-center p-4 pb-2 justify-between">
+<div class="flex size-10 shrink-0 items-center overflow-hidden rounded-full ring-2 ring-primary/20">
+<div class="bg-center bg-no-repeat aspect-square bg-cover size-full" data-alt="Profile picture of a smiling man in a blue shirt" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDK-Ef8u7r9ShDpRAv-5hMCBX29SkurJ8p_GW9g53WAPOUBqApl-yVa6RgPDFdNHrv48_hlZy0UYZGBQSqj6cSbRlWNUN9rkuRJAT4mmanxIPYyyDDJ7HaRg7cBdI7PIetanLqBhCZhat4GU8GABgvWcMuZbyxKeaFtrBWJ0AEn-Tl_GtM1vrw-CPYH3vE7r4cVEzjNgEglThI6d9F066DqsoeXuOJfYjkDJJyBABDD7b5tVNNu8AmfrOCkJ-jpBhWueZhE2xzxxiVo");'></div>
+</div>
+<div class="flex-1 ml-3">
+<p class="text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400 font-bold">Good Morning</p>
+<h2 class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-tight">Alex Harrison</h2>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex size-10 cursor-pointer items-center justify-center rounded-full bg-gray-200 dark:bg-[#232c48] text-gray-900 dark:text-white">
+<span class="material-symbols-outlined text-[22px]">notifications</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Search Bar -->
+<div class="px-4 py-3">
+<label class="flex flex-col min-w-40 h-12 w-full">
+<div class="flex w-full flex-1 items-stretch rounded-xl h-full shadow-sm">
+<div class="text-gray-500 dark:text-[#92a0c9] flex border-none bg-white dark:bg-[#232c48] items-center justify-center pl-4 rounded-l-xl">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-xl text-gray-900 dark:text-white focus:outline-0 focus:ring-0 border-none bg-white dark:bg-[#232c48] h-full placeholder:text-gray-400 dark:placeholder:text-[#92a0c9] px-4 pl-2 text-base font-normal leading-normal" placeholder="Search quotes or authors..." value=""/>
+</div>
+</label>
+</div>
+<!-- Quote of the Day Hero -->
+<div class="p-4">
+<div class="relative overflow-hidden bg-primary rounded-2xl shadow-xl transition-transform active:scale-[0.98]">
+<!-- Mesh Gradient Background Overlay -->
+<div class="absolute inset-0 opacity-80" style="background: radial-gradient(circle at 20% 20%, #1349ec 0%, transparent 50%), radial-gradient(circle at 80% 80%, #6366f1 0%, transparent 50%), radial-gradient(circle at 50% 50%, #3b82f6 0%, transparent 100%);"></div>
+<div class="bg-cover bg-center flex flex-col items-stretch justify-end min-h-[240px] relative z-10" data-alt="Abstract vibrant blue and purple mesh gradient" style="background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%);">
+<div class="flex w-full flex-col gap-4 p-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-white/80 text-sm">auto_awesome</span>
+<p class="text-white/80 text-xs font-bold uppercase tracking-[0.2em] leading-normal">Quote of the Day</p>
+</div>
+<div class="flex flex-col gap-2">
+<p class="text-white tracking-tight text-2xl font-extrabold leading-tight italic">
+                                "The only way to do great work is to love what you do."
+                            </p>
+<div class="flex items-center justify-between mt-2">
+<div class="flex items-center gap-2">
+<div class="w-6 h-[1px] bg-white/50"></div>
+<p class="text-white text-base font-semibold leading-normal">Steve Jobs</p>
+</div>
+<div class="flex gap-2">
+<button class="flex size-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md text-white">
+<span class="material-symbols-outlined text-xl">ios_share</span>
+</button>
+<button class="flex size-10 items-center justify-center rounded-full bg-white text-primary">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Section Header: Categories -->
+<div class="flex items-center justify-between px-4 pt-4">
+<h3 class="text-gray-900 dark:text-white text-lg font-extrabold leading-tight tracking-tight">Categories</h3>
+<button class="text-primary text-sm font-bold">See All</button>
+</div>
+<!-- Category Chips -->
+<div class="flex gap-3 px-4 py-3 overflow-x-auto hide-scrollbar">
+<div class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-xl bg-primary px-5 shadow-lg shadow-primary/20">
+<p class="text-white text-sm font-bold leading-normal">Motivation</p>
+</div>
+<div class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-xl bg-white dark:bg-[#232c48] px-5">
+<p class="text-gray-600 dark:text-white text-sm font-medium leading-normal">Love</p>
+</div>
+<div class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-xl bg-white dark:bg-[#232c48] px-5">
+<p class="text-gray-600 dark:text-white text-sm font-medium leading-normal">Success</p>
+</div>
+<div class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-xl bg-white dark:bg-[#232c48] px-5">
+<p class="text-gray-600 dark:text-white text-sm font-medium leading-normal">Wisdom</p>
+</div>
+<div class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-xl bg-white dark:bg-[#232c48] px-5">
+<p class="text-gray-600 dark:text-white text-sm font-medium leading-normal">Mindset</p>
+</div>
+</div>
+<!-- Section Header: Feed -->
+<div class="flex items-center justify-between px-4 pt-4 pb-2">
+<h3 class="text-gray-900 dark:text-white text-lg font-extrabold leading-tight tracking-tight">For You</h3>
+<div class="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+<span class="material-symbols-outlined text-lg">filter_list</span>
+<span class="text-xs font-bold uppercase tracking-wider">Latest</span>
+</div>
+</div>
+<!-- Quote Feed List -->
+<div class="px-4 space-y-4">
+<!-- Quote Card 1 -->
+<div class="bg-white dark:bg-[#1c243a] p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col gap-4">
+<div class="flex items-start justify-between">
+<span class="material-symbols-outlined text-primary/40 text-3xl">format_quote</span>
+<button class="text-gray-400 dark:text-gray-500 hover:text-red-500">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+<p class="text-gray-800 dark:text-gray-100 text-lg font-medium leading-relaxed">
+                    "Success is not final, failure is not fatal: it is the courage to continue that counts."
+                </p>
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden" data-alt="B&amp;W portrait of Winston Churchill">
+<img alt="author" class="size-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbM__dD9uOUVQiUXqiRUkFnAhi6LYJiFnJaGWIfms5Dppof8t2HNjikI1yMqeYMq7FX_vxOW9KQW5UA_oLBRkVasq-aFfhNilNtF1ebG2RrlbNkbraEaBTTkW8GcsgUpPXe9OXkXzt4l6xBnSJinLVkH0U5L-6CQhmsd8SGEw73BVn5XeaiWMmX71xywgQD7kmeKBzljBhgYGlWTyKF4zgIIxpSIWBamU81YkvSbx66Ikaw8vR2pNn7Tq58qiXSTGj99rAAR-G0lBs"/>
+</div>
+<div>
+<p class="text-sm font-bold dark:text-white">Winston Churchill</p>
+<p class="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">Historical</p>
+</div>
+</div>
+</div>
+<!-- Quote Card 2 -->
+<div class="bg-white dark:bg-[#1c243a] p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col gap-4">
+<div class="flex items-start justify-between">
+<span class="material-symbols-outlined text-primary/40 text-3xl">format_quote</span>
+<button class="text-gray-400 dark:text-gray-500">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+<p class="text-gray-800 dark:text-gray-100 text-lg font-medium leading-relaxed">
+                    "Your time is limited, so don't waste it living someone else's life."
+                </p>
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden" data-alt="Portrait of a visionary business leader">
+<img alt="author" class="size-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuChaMyrssenxIgTJHMG1FmWLGPnrKdcm_8ntNy-eK_dr9XxXjYYr5nMBRfFu_PYTezUVpbLF2lt7t-F6aVc1lwI9ZyRJ8Seznaaks3sgyJSWphKbV_Q5AuUcebgcDzuLzg-3OEnJzUD8D_HkrazS6KkZV6JdxNkFIj-jlkdCSWft-oVdkri3zIJz4hrBODmXXkbHTeXi4b00a3UBGsOg9SsFnS2IQJzvRq2NPmBdMWaaWDz_E24WaRRbCiMU1-U_lv1E8e3YQZWwSSl"/>
+</div>
+<div>
+<p class="text-sm font-bold dark:text-white">Steve Jobs</p>
+<p class="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">Success</p>
+</div>
+</div>
+</div>
+<!-- Quote Card 3 -->
+<div class="bg-white dark:bg-[#1c243a] p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col gap-4">
+<div class="flex items-start justify-between">
+<span class="material-symbols-outlined text-primary/40 text-3xl">format_quote</span>
+<button class="text-primary" style="font-variation-settings: 'FILL' 1;">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+<p class="text-gray-800 dark:text-gray-100 text-lg font-medium leading-relaxed">
+                    "Do what you can, with what you have, where you are."
+                </p>
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden" data-alt="Vintage photograph of Theodore Roosevelt">
+<img alt="author" class="size-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBO__frWO5MhXjBIcIYGKUutQhJFr_SxSvYikhYeAPVSbvS5F8LEd5uQA6rpX2xraqcFyc47tnsDVY-q9yOtIa98LeapuFCytqTooWCTHWQ7hOqSyYUuHzYoKat4XRAPimgFKZQkYDyleCwWNpvIqaOlvu7ZcW32UWt_0vttYhTKfGOm_BEPDC6wZ1X-nqsKOCAutQ7gTZeJijLcQb7-DNXHrK6IirIm87mXgLuDytlgilfNP7Gi_BYKS7A0BhbsrGMUwX8eKCaeGnJ"/>
+</div>
+<div>
+<p class="text-sm font-bold dark:text-white">Theodore Roosevelt</p>
+<p class="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">Wisdom</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Navigation Bar (iOS style) -->
+<nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white/90 dark:bg-background-dark/90 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 px-6 py-3 pb-8 flex items-center justify-between z-50">
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-[10px] font-bold">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500">
+<span class="material-symbols-outlined text-2xl">explore</span>
+<span class="text-[10px] font-bold">Discover</span>
+</button>
+<div class="relative -top-6">
+<button class="flex size-14 items-center justify-center rounded-full bg-primary text-white shadow-xl shadow-primary/40 ring-4 ring-background-light dark:ring-background-dark">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</div>
+<button class="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500">
+<span class="material-symbols-outlined text-2xl">bookmark</span>
+<span class="text-[10px] font-bold">Saved</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500">
+<span class="material-symbols-outlined text-2xl">person</span>
+<span class="text-[10px] font-bold">Profile</span>
+</button>
+</nav>
+</div>
+</body></html>

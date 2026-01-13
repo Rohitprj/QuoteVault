@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1349ec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101522",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-white">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Background Image Container -->
+<div class="fixed inset-0 z-0">
+<div class="absolute inset-0 bg-gradient-to-b from-background-dark/40 via-background-dark/80 to-background-dark z-10"></div>
+<div class="w-full h-full bg-center bg-no-repeat bg-cover" data-alt="Peaceful misty mountain landscape at dawn" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCIBTlyxe5Vz8ANLAfNkDTi1PfdrVRrKkHWGR69yFK4t8jDORjEsqWkZx7M67sjeQJn8Pqgm8VXHzs5kofjlNUJ34LG9hVivUX4st8Fi1FXNDWCLpVzKrH2Dnl3kBUqC0RIIz8R3ABkDnZF7RuqeITtfApct49UDmvU-6XwdVhwB87X7byTgatPmItv3bkiUotW9MH-9jTbdWcKleqCudd57iQ0q9Nn9q7i-SJTS5FMhf7s7dALAVW5z5biKBkgqSPz-Sz4sCuzs3je");'>
+</div>
+</div>
+<!-- Content Content -->
+<div class="relative z-20 flex flex-col min-h-screen px-6 pt-20 pb-10">
+<!-- Header Section -->
+<div class="mb-12">
+<h1 class="text-white tracking-tight text-[36px] font-bold leading-tight text-center pb-2">Start your journey.</h1>
+<p class="text-white/80 text-lg font-normal leading-normal text-center">Collect words that move you.</p>
+</div>
+<!-- Form Section -->
+<div class="flex flex-col gap-4 w-full max-w-[400px] mx-auto">
+<!-- Email Field -->
+<div class="flex flex-col w-full">
+<label class="flex flex-col w-full">
+<p class="text-white/70 text-sm font-medium leading-normal pb-2 pl-1">Email</p>
+<input class="form-input flex w-full rounded-xl text-white focus:outline-0 focus:ring-2 focus:ring-primary border border-white/10 bg-white/5 backdrop-blur-md h-14 placeholder:text-white/30 px-5 text-base font-normal transition-all" placeholder="Enter your email" type="email" value=""/>
+</label>
+</div>
+<!-- Password Field -->
+<div class="flex flex-col w-full">
+<label class="flex flex-col w-full">
+<p class="text-white/70 text-sm font-medium leading-normal pb-2 pl-1">Password</p>
+<div class="flex w-full items-stretch rounded-xl border border-white/10 bg-white/5 backdrop-blur-md focus-within:ring-2 focus-within:ring-primary transition-all">
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-transparent h-14 text-white focus:ring-0 placeholder:text-white/30 px-5 text-base font-normal" placeholder="Create a password" type="password" value=""/>
+<div class="text-white/40 flex items-center justify-center pr-5" data-icon="visibility">
+<span class="material-symbols-outlined cursor-pointer">visibility</span>
+</div>
+</div>
+</label>
+</div>
+<!-- Primary Action -->
+<button class="mt-6 w-full h-14 bg-primary text-white font-bold text-lg rounded-xl shadow-lg shadow-primary/20 active:scale-[0.98] transition-transform">
+                    Create Account
+                </button>
+<!-- Divider -->
+<div class="flex items-center gap-4 my-6">
+<div class="h-[1px] flex-1 bg-white/10"></div>
+<span class="text-white/30 text-xs font-medium uppercase tracking-widest">or continue with</span>
+<div class="h-[1px] flex-1 bg-white/10"></div>
+</div>
+<!-- Social Logins -->
+<div class="flex gap-4">
+<button class="flex-1 h-14 flex items-center justify-center rounded-xl border border-white/10 bg-white/5 backdrop-blur-md active:scale-[0.98] transition-transform">
+<span class="material-symbols-outlined">brand_family</span>
+<span class="ml-2 font-medium">Apple</span>
+</button>
+<button class="flex-1 h-14 flex items-center justify-center rounded-xl border border-white/10 bg-white/5 backdrop-blur-md active:scale-[0.98] transition-transform">
+<span class="material-symbols-outlined">language</span>
+<span class="ml-2 font-medium">Google</span>
+</button>
+</div>
+</div>
+<!-- Footer Section -->
+<div class="mt-auto pt-10 flex flex-col items-center gap-4">
+<p class="text-white/60 text-base font-normal">
+                    Already have an account? 
+                    <a class="text-primary font-bold ml-1" href="#">Sign In</a>
+</p>
+<p class="text-white/30 text-[11px] px-8 text-center leading-tight">
+                    By creating an account, you agree to our 
+                    <a class="underline" href="#">Terms of Service</a> and 
+                    <a class="underline" href="#">Privacy Policy</a>.
+                </p>
+</div>
+</div>
+</div>
+</body></html>

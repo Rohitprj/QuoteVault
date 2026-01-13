@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1349ec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101522",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white min-h-screen flex flex-col">
+<!-- Top Navigation Bar -->
+<nav class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-50">
+<div class="text-slate-900 dark:text-white flex size-12 shrink-0 items-center justify-start cursor-pointer">
+<span class="material-symbols-outlined">arrow_back_ios</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Customize Quote</h2>
+<div class="flex w-12 items-center justify-end">
+<button class="flex size-12 cursor-pointer items-center justify-center rounded-xl bg-transparent text-slate-900 dark:text-white">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+</nav>
+<main class="flex-1 overflow-y-auto pb-32">
+<!-- Live Preview Card Section -->
+<div class="@container px-4 py-4">
+<div class="aspect-[4/5] w-full bg-cover bg-center flex flex-col justify-center items-center overflow-hidden rounded-xl shadow-2xl relative" data-alt="Modern geometric abstract background in dark blue and purple" style='background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url("https://lh3.googleusercontent.com/aida-public/AB6AXuCWyWeRqcaZc_4GX07SwjGNWZKojnHLyE4zqLyFdtRN2-ltQQhOZYRVANWNNbULdCU4EyY7io8EHnFJd9rqNHiZRbHI_1AlW_6tYFxpUqawpBQMVR1qemA5n_68K9FZV-xsagJ4H2lefRay1W7vdy20m2uCFHFO-mqgexkc0DN0wjehqOjUwiivRcjrFphHpmjy4Msu90P_Fd_2A6r9ugrk0xbOD6HQAuYwoELXfHJXcnkYz42hF3braiOZp8AQjQ3AwfYE-eqTYb0V");'>
+<div class="absolute top-4 right-4 flex gap-2">
+<button class="bg-black/20 backdrop-blur-md p-2 rounded-full text-white">
+<span class="material-symbols-outlined text-sm">crop_square</span>
+</button>
+<button class="bg-black/20 backdrop-blur-md p-2 rounded-full text-white">
+<span class="material-symbols-outlined text-sm">stay_primary_portrait</span>
+</button>
+</div>
+<div class="p-8 text-center">
+<span class="material-symbols-outlined text-white/40 text-4xl mb-4">format_quote</span>
+<p class="text-white tracking-tight text-3xl font-bold leading-tight italic">
+                        "The only way to do great work is to love what you do."
+                    </p>
+<div class="mt-6 flex flex-col items-center">
+<div class="h-0.5 w-8 bg-primary mb-4"></div>
+<p class="text-white/90 text-lg font-medium tracking-wide">STEVE JOBS</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Customization Controls -->
+<section class="mt-4">
+<div class="px-4 flex justify-between items-center">
+<h3 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Background</h3>
+<span class="text-primary text-sm font-bold">View All</span>
+</div>
+<div class="flex overflow-x-auto no-scrollbar items-stretch p-4 gap-4">
+<div class="flex flex-col gap-2 min-w-[100px] cursor-pointer group">
+<div class="w-full aspect-square bg-center bg-cover rounded-xl ring-2 ring-primary ring-offset-2 ring-offset-background-dark" data-alt="Abstract vibrant gradient colors" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCup_s7yjqU2uqWk5Hl_00lJD8B33u3gIrF_4pzip5z_nuBvUP0NvbT4IOyOHIjEIjSOhdAG0VELZjxtk0Ny-XJMuhlgI7WLqRNEu3qWFKwSfy2rkkXmBwEejxrVN_QTkyKOTEO3WOAUwNICdXfDV7WTcYagxTw7OWt_Vm_XoDnhR0QwvBjzT7nidE7c5nkO_EQlAKmugw2c7w8Nku2p3eDhGxr0m8oakZDCT0S2D9vqgIf23uFgSxoUSB7b_fVjj1brjs6WiRD1BCu");'></div>
+<p class="text-slate-900 dark:text-white text-xs font-bold text-center">Modern</p>
+</div>
+<div class="flex flex-col gap-2 min-w-[100px] cursor-pointer">
+<div class="w-full aspect-square bg-center bg-cover rounded-xl" data-alt="Deep forest landscape with fog" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDj306OKU3zx7VkJ97no0dHHP9vO_4vGXOoU9nkpD6gyiGVDGemMlTTPsTNaaGT-o2Vvwkgg4JMDeIPQdsZ4yjgyL7HhL2ZvKH-H8FZwh993j91Y3rDWiSr4qXsETW2idH7QiDf0h4dsJaeqnYy6WnWCQTeEy5AKKVi5ptbiDKkOb9cFS0TwI0IbZUM2X2nHUmQ6YGAH8CDvMvVjHmfJdu_4kz4E-LT_8A0PeTMCyx33TWNQ1nueJp54rS6CjYcDabD-7yx0BqwOd85");'></div>
+<p class="text-slate-600 dark:text-slate-400 text-xs font-medium text-center">Nature</p>
+</div>
+<div class="flex flex-col gap-2 min-w-[100px] cursor-pointer">
+<div class="w-full aspect-square bg-center bg-cover rounded-xl" data-alt="Golden hour mountain sunset" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBQxAgFN4wPODzEELmoRL-ogTFYo1YF144fSOQh34UEGYeOybWAYRCI19drHjKwrxmWOXcwzAqidSGNm3mc6y8Sj8ykPhh5mQk6RXKYolAwI5bnXdft8uFu4I_p6a3GZ1l_hqkRYR33yFQTw6nRKNaocx13GnTwoUwI8a7k7B_hMlErabFZzZbI-49uYWAIAKrJiVI0WTySwXdaeu4XIFsUco1b_ofWhamTD6nqzcISNP2O9B5LASjPF5KmKKPjuz4fbPfOP62I2D9a");'></div>
+<p class="text-slate-600 dark:text-slate-400 text-xs font-medium text-center">Majestic</p>
+</div>
+<div class="flex flex-col gap-2 min-w-[100px] cursor-pointer">
+<div class="w-full aspect-square bg-center bg-cover rounded-xl" data-alt="Soft pink and blue marble texture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCdzh2J7VUBqcvzqG1NFE4tRSKHFcBOf7nrPLeZJIdyUD5sUPJwreHIt-a_U9STtUrUWdib9YdP4XsRaTU8nMSkfPGw1R1vwWX55HcPVPytVvB0C5YrOZ_uxtjq4Gj3NGdnJrCuz7bLQrDWHjA2pVCHUDVL--1Z69GyHtm88BKEEiD-05usi3w8skdM2ZGmKGX4BUBti3L5deQXAWAZCZ3FUXlBWE4h1wHKvpz9vPWxXWOJWZyRzCOvK9x0pyD3pgzfBKcgdOPnAhLe");'></div>
+<p class="text-slate-600 dark:text-slate-400 text-xs font-medium text-center">Pastel</p>
+</div>
+</div>
+</section>
+<section class="mt-4">
+<h3 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2">Font Style</h3>
+<div class="px-4 py-2">
+<div class="flex bg-slate-200 dark:bg-slate-800 p-1 rounded-xl">
+<button class="flex-1 bg-white dark:bg-slate-700 py-2 rounded-lg text-sm font-bold shadow-sm">Modern</button>
+<button class="flex-1 py-2 text-sm font-medium text-slate-500">Classic</button>
+<button class="flex-1 py-2 text-sm font-medium text-slate-500">Elegant</button>
+<button class="flex-1 py-2 text-sm font-medium text-slate-500">Minimal</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Action Footer -->
+<footer class="fixed bottom-0 left-0 right-0 p-4 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 flex gap-3">
+<button class="flex-1 flex items-center justify-center gap-2 h-14 rounded-xl border-2 border-slate-300 dark:border-slate-700 bg-transparent text-slate-900 dark:text-white font-bold transition-all active:scale-95">
+<span class="material-symbols-outlined">text_fields</span>
+            Share Text
+        </button>
+<button class="flex-[1.5] flex items-center justify-center gap-2 h-14 rounded-xl bg-primary text-white font-bold shadow-lg shadow-primary/25 transition-all active:scale-95">
+<span class="material-symbols-outlined">download</span>
+            Save as Image
+        </button>
+</footer>
+</body></html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Settings &amp; Personalization</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1349ec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101522",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white min-h-screen">
+<div class="max-w-[480px] mx-auto min-h-screen shadow-2xl relative flex flex-col">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-10 bg-background-light dark:bg-background-dark border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center p-4 justify-between">
+<div class="text-slate-900 dark:text-white flex size-10 items-center justify-center cursor-pointer">
+<span class="material-symbols-outlined text-2xl">arrow_back_ios_new</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Settings</h2>
+<div class="size-10 flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl opacity-0">more_horiz</span>
+</div>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto pb-10">
+<!-- ProfileHeader -->
+<div class="flex p-4 @container mt-2">
+<div class="flex w-full flex-col gap-4 @[520px]:flex-row @[520px]:justify-between @[520px]:items-center">
+<div class="flex gap-4 items-center">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full min-h-[80px] w-[80px] border-2 border-primary" data-alt="User profile photo showing a person in soft lighting" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDyx14FeF1uiAA2Y0qkM4BneLL7FyWlLl6qhnNIpmJAqV6zOTW68tPnT02tO0PC529qCMIaj_7xwcrPz-6kpFk6ZCKGHeEs_UfBq9DI1vA6AQmPkMWWSzlgrHjQvCJn4-sls4IDpjcIeIeE_TXuPBwi9zaSfpQkIt7cS0gskHRtlgWha6WYBfFalrAkb8rcqhpo99droYbFerSSz5dcU5XMbW1CdFE2XTA6MocYBCnkyRRiqDbQFN3Yv9-PGXszJoSrnvpDTyqlfbdo");'></div>
+<div class="flex flex-col justify-center">
+<p class="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-[-0.015em]">Marcus Aurelius</p>
+<p class="text-slate-500 dark:text-[#92a0c9] text-sm font-normal leading-normal">marcus.app@stoic.com</p>
+</div>
+</div>
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-slate-200 dark:bg-[#232c48] text-slate-900 dark:text-white text-sm font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">Edit Profile</span>
+</button>
+</div>
+</div>
+<!-- Appearance Section -->
+<div class="mt-4">
+<h3 class="text-slate-900 dark:text-white text-sm font-bold uppercase tracking-wider px-4 pb-3 opacity-60">Appearance</h3>
+<!-- Theme Toggle -->
+<div class="flex items-center gap-4 bg-white dark:bg-background-dark px-4 min-h-[60px] justify-between border-t border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-4 text-slate-900 dark:text-white">
+<div class="flex items-center justify-center rounded-lg bg-slate-100 dark:bg-[#232c48] shrink-0 size-10">
+<span class="material-symbols-outlined">dark_mode</span>
+</div>
+<p class="text-base font-medium flex-1 truncate">Dark Mode</p>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-slate-200 dark:bg-[#232c48] p-0.5 has-[:checked]:justify-end has-[:checked]:bg-primary">
+<div class="h-full w-[27px] rounded-full bg-white shadow-md"></div>
+<input checked="" class="invisible absolute" type="checkbox"/>
+</label>
+</div>
+</div>
+<!-- Accent Color Picker -->
+<div class="bg-white dark:bg-background-dark border-t border-slate-100 dark:border-slate-800 px-4 py-4">
+<p class="text-slate-900 dark:text-white text-base font-medium mb-3">Accent Color</p>
+<div class="flex gap-4">
+<div class="size-10 rounded-full bg-primary border-4 border-white dark:border-slate-700 cursor-pointer shadow-lg"></div>
+<div class="size-10 rounded-full bg-indigo-500 cursor-pointer hover:scale-105 transition-transform"></div>
+<div class="size-10 rounded-full bg-teal-500 cursor-pointer hover:scale-105 transition-transform"></div>
+<div class="size-10 rounded-full bg-rose-500 cursor-pointer hover:scale-105 transition-transform"></div>
+<div class="size-10 rounded-full bg-amber-500 cursor-pointer hover:scale-105 transition-transform"></div>
+</div>
+</div>
+<!-- Font Size Slider -->
+<div class="bg-white dark:bg-background-dark border-t border-b border-slate-100 dark:border-slate-800 px-4 py-4">
+<div class="flex justify-between items-center mb-3">
+<p class="text-slate-900 dark:text-white text-base font-medium">Text Size</p>
+<span class="text-xs text-slate-500 dark:text-slate-400">Medium</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-sm font-bold text-slate-400">A</span>
+<div class="relative w-full h-1.5 bg-slate-200 dark:bg-[#232c48] rounded-full">
+<div class="absolute left-0 top-0 h-full w-1/2 bg-primary rounded-full"></div>
+<div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-5 bg-white border-2 border-primary rounded-full shadow-lg cursor-pointer"></div>
+</div>
+<span class="text-xl font-bold text-slate-400">A</span>
+</div>
+</div>
+</div>
+<!-- Notifications Section -->
+<div class="mt-8">
+<h3 class="text-slate-900 dark:text-white text-sm font-bold uppercase tracking-wider px-4 pb-3 opacity-60">Daily Inspiration</h3>
+<!-- Notification Toggle -->
+<div class="flex items-center gap-4 bg-white dark:bg-background-dark px-4 min-h-[60px] justify-between border-t border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-4 text-slate-900 dark:text-white">
+<div class="flex items-center justify-center rounded-lg bg-slate-100 dark:bg-[#232c48] shrink-0 size-10">
+<span class="material-symbols-outlined">notifications_active</span>
+</div>
+<p class="text-base font-medium flex-1 truncate">Quote of the Day</p>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-slate-200 dark:bg-[#232c48] p-0.5 has-[:checked]:justify-end has-[:checked]:bg-primary">
+<div class="h-full w-[27px] rounded-full bg-white shadow-md"></div>
+<input checked="" class="invisible absolute" type="checkbox"/>
+</label>
+</div>
+</div>
+<!-- Time Picker -->
+<div class="flex items-center gap-4 bg-white dark:bg-background-dark px-4 min-h-[60px] justify-between border-t border-b border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-4 text-slate-900 dark:text-white">
+<div class="flex items-center justify-center rounded-lg bg-slate-100 dark:bg-[#232c48] shrink-0 size-10">
+<span class="material-symbols-outlined">schedule</span>
+</div>
+<p class="text-base font-medium flex-1 truncate">Reminder Time</p>
+</div>
+<div class="bg-slate-100 dark:bg-[#232c48] px-3 py-1.5 rounded-lg">
+<span class="text-primary font-bold">08:30 AM</span>
+</div>
+</div>
+</div>
+<!-- Other Links -->
+<div class="mt-8">
+<div class="flex items-center gap-4 bg-white dark:bg-background-dark px-4 min-h-[56px] justify-between border-t border-slate-100 dark:border-slate-800">
+<p class="text-slate-900 dark:text-white text-base font-medium">Privacy Policy</p>
+<span class="material-symbols-outlined text-slate-400">chevron_right</span>
+</div>
+<div class="flex items-center gap-4 bg-white dark:bg-background-dark px-4 min-h-[56px] justify-between border-t border-slate-100 dark:border-slate-800">
+<p class="text-slate-900 dark:text-white text-base font-medium">Terms of Service</p>
+<span class="material-symbols-outlined text-slate-400">chevron_right</span>
+</div>
+<div class="flex items-center gap-4 bg-white dark:bg-background-dark px-4 min-h-[56px] justify-between border-t border-b border-slate-100 dark:border-slate-800">
+<p class="text-rose-500 text-base font-bold">Sign Out</p>
+</div>
+</div>
+<div class="text-center py-8">
+<p class="text-slate-400 text-xs font-medium">Version 2.4.0 (Stoic Edition)</p>
+</div>
+</main>
+<!-- iOS Style Bottom Tab Bar -->
+<nav class="bg-white/80 dark:bg-background-dark/80 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 h-[84px] px-6 flex justify-between items-start pt-3">
+<div class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined text-[26px]">format_quote</span>
+<span class="text-[10px] font-bold">Discover</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined text-[26px]">favorite</span>
+<span class="text-[10px] font-bold">Library</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[26px] fill-[1]">settings</span>
+<span class="text-[10px] font-bold">Settings</span>
+</div>
+</nav>
+</div>
+</body></html>

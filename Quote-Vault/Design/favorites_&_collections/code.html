@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Favorites &amp; Collections</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1349ec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101522",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+        /* Custom scrollbar for clean mobile look */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-40 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
+<div class="flex items-center p-4 pb-2 justify-between">
+<div class="flex size-10 shrink-0 items-center">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8 border-2 border-primary/20" data-alt="User profile avatar with colorful abstract pattern" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB2uZsSf33qKK05V-iEKvVZ6hpIH3a1tdfAKYU7Jf2PmW_gJnCVPbz8DEk7ezqnW-Yx7JGESO7I1wGyJ2OyoeYci6WXRjyf95pp5CKGx8Vx0zsdJgI8Jenc1XnvhUG1W6jekKlnf2miYT-VVjq23YXyZW5XJvq4fp11Ho7jl9KdX-wkA5ogvuP70Z8AQqX_SWynP6WNXuHhvdmI0yE_UQdbkbJM-24f_agZP7zeEOhqf5A9t4WTh8_tvRuisqrTUXNrba7C3_LxI6be");'>
+</div>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Favorites</h2>
+<div class="flex w-10 items-center justify-end">
+<button class="flex cursor-pointer items-center justify-center rounded-lg h-10 w-10 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined">search</span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex-1 pb-24">
+<!-- SectionHeader: Collections -->
+<div class="flex items-center justify-between px-4 pt-6 pb-3">
+<h2 class="text-[22px] font-bold leading-tight tracking-[-0.015em]">Your Collections</h2>
+<button class="text-primary text-sm font-semibold">See all</button>
+</div>
+<!-- ImageGrid: Collections -->
+<div class="grid grid-cols-2 gap-3 p-4">
+<div class="relative overflow-hidden group cursor-pointer aspect-square rounded-xl bg-cover bg-center flex flex-col justify-end p-4" data-alt="Inspirational sunrise landscape for morning motivation" style='background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 60%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuBs6e_fbxVRQx0nvNeYs23vqFpospEEiTj7ymuFTx8cXvj9CU97l1t45IFosqV4srLdNR9WIiScE52RHbimNh33bbp1RG1qTDZ4JwkOcdcNLmm8SyJ1Iho9Ya9_ZXiKW7ta3BktEAwSxEEwncvIeLiIgCLXFVq80dH_z_6VWyIwifTnzXH41IJ1WvHeyRRehy0sTXXX0VGpv6g8kRz45jgYGwljKGTjwKMYHda0pCMlaagZ5F4drMNbjPIdbLTm0T31tMLoW0qpN8oa");'>
+<p class="text-white text-base font-bold leading-tight">Morning Motivation</p>
+<p class="text-white/70 text-xs mt-1">12 Quotes</p>
+</div>
+<div class="relative overflow-hidden group cursor-pointer aspect-square rounded-xl bg-cover bg-center flex flex-col justify-end p-4" data-alt="Classical Greek statue profile representing stoic philosophy" style='background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 60%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuCGWio2eBIOZdgcelwJQzLmbOE6Y9diT3X2lKGmPdxUVvmU8CPcEATQsLq9DL-vNxSx1kZc4xwHthRP9GKTfR6bEOSIdJWGnMVpU5HxewT2QIVCNF1S-vXh4tRS1_644eqWeNfOF4Ite2UYinP_NVnDwWpTG0Td2QtbEfY4t3EgtEwSk6MicRTr9PuDxmTSHGxGEvZCRYSuvF1tt92f01GiFPtgXfTpR26SDY-EzfztfFIEp9PjJXlvH5xrwPaFQ7RpbmcDwydwhx1q");'>
+<p class="text-white text-base font-bold leading-tight">Stoicism</p>
+<p class="text-white/70 text-xs mt-1">8 Quotes</p>
+</div>
+<div class="relative overflow-hidden group cursor-pointer aspect-square rounded-xl bg-cover bg-center flex flex-col justify-end p-4" data-alt="Warm abstract soft pink and red hues for love theme" style='background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 60%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuBhgmcpcipN0rEWjr573E9SO1pmdDI8PQKXI6aIPoaDy-hZZ5WzCJ7JZEdlhuKTZ28AjR2CEVW4zU-A5YQ-o1mPncmDvijG36AQDngfn9TuId2BQRUcCjuvljKPGeqlD31Hv_NDhXjYKks6PHzul-Kjs_xd6eP6rKB5dTAFgWcQzLdRk1Ky2wtyX2llxE7zM6Qrr2xSc1k8coB4DXcohqWjUDSGC2gO-fC1Lu1U-pAAWWUk08OzITWhNvR1vGf8ck6T7Jrk-dlAJ0In");'>
+<p class="text-white text-base font-bold leading-tight">Love &amp; Life</p>
+<p class="text-white/70 text-xs mt-1">24 Quotes</p>
+</div>
+<div class="relative overflow-hidden group cursor-pointer aspect-square rounded-xl bg-cover bg-center flex flex-col justify-end p-4" data-alt="Modern high-rise office buildings for career growth theme" style='background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 60%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuDoKQV1czCORXRN-DlT67lccNZ5sWBs_thhTH4i7zTblsBvWQMvedcO-3wgoiC-6t5nlj5HbfLnbnRdRyYdRMzKy1DK7rzNZfIxR7IbnM-MLYFTlbj56mJNVtG9dn_QprPSOXuKpIwj4_slPvz9El5oM612Uihe-03rh2SpjTmNfVbs_y9tDG78PprYAqa-R8I8wAZWnZSODGCEo6L70RXeoPfII2tGRNS4Z7daJ0es447fTLJ-EpyzPPguseUmKbfsGwnsVDztCjDA");'>
+<p class="text-white text-base font-bold leading-tight">Career Growth</p>
+<p class="text-white/70 text-xs mt-1">15 Quotes</p>
+</div>
+</div>
+<!-- SectionHeader: Favorites -->
+<div class="px-4 pb-3 pt-8">
+<h2 class="text-[22px] font-bold leading-tight tracking-[-0.015em]">Favorite Quotes</h2>
+</div>
+<!-- ListItem Feed -->
+<div class="flex flex-col gap-1 px-2">
+<!-- Quote 1 -->
+<div class="flex gap-4 px-4 py-4 justify-between bg-white/5 dark:bg-white/5 rounded-xl border border-transparent hover:border-primary/20 transition-all mb-2">
+<div class="flex items-start gap-4">
+<div class="text-primary flex items-center justify-center rounded-lg bg-primary/10 shrink-0 size-11">
+<span class="material-symbols-outlined">format_quote</span>
+</div>
+<div class="flex flex-1 flex-col justify-center">
+<p class="text-sm font-medium leading-relaxed italic">"The only way to do great work is to love what you do."</p>
+<div class="flex items-center gap-2 mt-2">
+<span class="text-primary text-xs font-bold">— Steve Jobs</span>
+<span class="text-slate-400 dark:text-slate-500 text-[10px]">• 2 days ago</span>
+</div>
+</div>
+</div>
+<div class="shrink-0 flex items-center">
+<button class="text-primary flex size-8 items-center justify-center">
+<span class="material-symbols-outlined fill-icon">favorite</span>
+</button>
+</div>
+</div>
+<!-- Quote 2 -->
+<div class="flex gap-4 px-4 py-4 justify-between bg-white/5 dark:bg-white/5 rounded-xl border border-transparent hover:border-primary/20 transition-all mb-2">
+<div class="flex items-start gap-4">
+<div class="text-primary flex items-center justify-center rounded-lg bg-primary/10 shrink-0 size-11">
+<span class="material-symbols-outlined">format_quote</span>
+</div>
+<div class="flex flex-1 flex-col justify-center">
+<p class="text-sm font-medium leading-relaxed italic">"Very little is needed to make a happy life; it is all within yourself."</p>
+<div class="flex items-center gap-2 mt-2">
+<span class="text-primary text-xs font-bold">— Marcus Aurelius</span>
+<span class="text-slate-400 dark:text-slate-500 text-[10px]">• 1 week ago</span>
+</div>
+</div>
+</div>
+<div class="shrink-0 flex items-center">
+<button class="text-primary flex size-8 items-center justify-center">
+<span class="material-symbols-outlined fill-icon">favorite</span>
+</button>
+</div>
+</div>
+<!-- Quote 3 -->
+<div class="flex gap-4 px-4 py-4 justify-between bg-white/5 dark:bg-white/5 rounded-xl border border-transparent hover:border-primary/20 transition-all mb-2">
+<div class="flex items-start gap-4">
+<div class="text-primary flex items-center justify-center rounded-lg bg-primary/10 shrink-0 size-11">
+<span class="material-symbols-outlined">format_quote</span>
+</div>
+<div class="flex flex-1 flex-col justify-center">
+<p class="text-sm font-medium leading-relaxed italic">"Success is not final, failure is not fatal: it is the courage to continue that counts."</p>
+<div class="flex items-center gap-2 mt-2">
+<span class="text-primary text-xs font-bold">— Winston Churchill</span>
+<span class="text-slate-400 dark:text-slate-500 text-[10px]">• 3 weeks ago</span>
+</div>
+</div>
+</div>
+<div class="shrink-0 flex items-center">
+<button class="text-primary flex size-8 items-center justify-center">
+<span class="material-symbols-outlined fill-icon">favorite</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-24 right-6 size-14 bg-primary text-white rounded-full shadow-lg shadow-primary/30 flex items-center justify-center z-50 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+<!-- Bottom Tab Bar (iOS style) -->
+<nav class="fixed bottom-0 w-full bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-6 py-3 flex justify-between items-center z-40">
+<div class="flex flex-col items-center gap-1 opacity-50">
+<span class="material-symbols-outlined">explore</span>
+<span class="text-[10px] font-medium">Explore</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined fill-icon">bookmarks</span>
+<span class="text-[10px] font-bold">Library</span>
+</div>
+<div class="flex flex-col items-center gap-1 opacity-50">
+<span class="material-symbols-outlined">trending_up</span>
+<span class="text-[10px] font-medium">Daily</span>
+</div>
+<div class="flex flex-col items-center gap-1 opacity-50">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Profile</span>
+</div>
+</nav>
+</div>
+</body></html>

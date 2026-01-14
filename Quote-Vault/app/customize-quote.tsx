@@ -12,7 +12,10 @@ import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../contexts/ThemeContext";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { Button } from "../components/ui/Button";
 
 const { width } = Dimensions.get("window");
@@ -52,13 +55,15 @@ export default function CustomizeQuoteScreen() {
     textSize === "small" ? 12 : textSize === "large" ? 16 : 14;
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <StatusBar style="light" />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={{
           paddingBottom: 100,
-          paddingTop: insets.top,
+          // paddingTop: insets.top,
         }}
         showsVerticalScrollIndicator={false}
       >
@@ -272,7 +277,7 @@ export default function CustomizeQuoteScreen() {
           />
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 

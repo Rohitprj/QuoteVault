@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  ActivityIndicator, // Import ActivityIndicator
 } from "react-native";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -17,6 +18,8 @@ import {
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import { Toggle } from "../../components/ui/Toggle";
+import { useAuth } from "../../contexts/AuthContext"; // Import useAuth
+import { Button } from "../../components/ui/Button"; // Import Button
 
 const accentColors: { name: AccentColor; color: string }[] = [
   { name: "blue", color: "#007AFF" },
@@ -39,6 +42,8 @@ export default function SettingsScreen() {
     setTextSize,
   } = useTheme();
   const insets = useSafeAreaInsets();
+  const { signOut } = useAuth(); // Destructure signOut from useAuth
+  const [loading, setLoading] = useState(false); // Add loading state
   const [darkMode, setDarkMode] = useState(theme === "dark");
   const [quoteOfTheDayEnabled, setQuoteOfTheDayEnabled] = useState(true);
   const [reminderTime] = useState("08:30 AM");
@@ -48,13 +53,20 @@ export default function SettingsScreen() {
     setTheme(value ? "dark" : "light");
   };
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     Alert.alert("Sign Out", "Are you sure you want to sign out?", [
       { text: "Cancel", style: "cancel" },
       {
         text: "Sign Out",
         style: "destructive",
-        onPress: () => router.replace("/sign-in"),
+        onPress: async () => {
+          setLoading(true);
+          const { error } = await signOut();
+          if (error) {
+            Alert.alert("Logout Error", error.message);
+          }
+          setLoading(false);
+        },
       },
     ]);
   };
@@ -465,19 +477,15 @@ export default function SettingsScreen() {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.settingRow} onPress={handleSignOut}>
-            <Text
-              style={[
-                styles.settingLabel,
-                {
-                  color: "#FF3B30",
-                  fontSize: labelFontSize,
-                },
-              ]}
-            >
-              Sign Out
-            </Text>
-          </TouchableOpacity>
+          <View style={{ paddingHorizontal: 20, marginTop: 10 }}>
+            <Button
+              title={loading ? <ActivityIndicator color={colors.text} /> : "Sign Out"}
+              onPress={handleSignOut}
+              variant="destructive"
+              size="large"
+              disabled={loading}
+            />
+          </View>
         </View>
 
         {/* Version */}

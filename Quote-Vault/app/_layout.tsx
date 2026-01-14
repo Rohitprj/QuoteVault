@@ -46,6 +46,7 @@ function RootLayoutNav() {
             name="customize-quote"
             options={{ headerShown: false }}
           />
+          <Stack.Screen name="reset-password" options={{ headerShown: false }} />
         </Stack>
       </ThemeProvider>
     </SafeAreaProvider>

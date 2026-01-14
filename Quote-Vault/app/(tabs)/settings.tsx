@@ -22,6 +22,14 @@ import { useAuth } from "../../contexts/AuthContext"; // Import useAuth
 import { Button } from "../../components/ui/Button"; // Import Button
 import * as ImagePicker from 'expo-image-picker'; // Import ImagePicker
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
+import {
+  scheduleDailyQuoteNotification,
+  disableNotifications,
+  getNotificationSettings,
+  updateNotificationTime,
+  sendTestNotification
+} from '../../services/notificationsService';
+import { updateUserSettings } from '../../services/profileService';
 
 const accentColors: { name: AccentColor; color: string }[] = [
   { name: "blue", color: "#007AFF" },
@@ -49,8 +57,9 @@ export default function SettingsScreen() {
   const { signOut, user } = useAuth(); // Destructure signOut and user from useAuth
   const [loading, setLoading] = useState(false); // Add loading state
   const [darkMode, setDarkMode] = useState(theme === "dark");
-  const [quoteOfTheDayEnabled, setQuoteOfTheDayEnabled] = useState(true);
-  const [reminderTime] = useState("08:30 AM");
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [notificationHour, setNotificationHour] = useState(9);
+  const [notificationMinute, setNotificationMinute] = useState(0);
   const [profileImageUri, setProfileImageUri] = useState<string | null>(null); // State for profile image
 
   // Load profile image from AsyncStorage on mount
@@ -66,6 +75,19 @@ export default function SettingsScreen() {
       }
     };
     loadProfileImage();
+  }, []);
+
+  // Load notification settings
+  useEffect(() => {
+    const loadNotificationSettings = async () => {
+      const settings = await getNotificationSettings();
+      if (settings) {
+        setNotificationsEnabled(settings.enabled);
+        setNotificationHour(settings.hour);
+        setNotificationMinute(settings.minute);
+      }
+    };
+    loadNotificationSettings();
   }, []);
 
   // Save profile image to AsyncStorage whenever it changes
@@ -87,6 +109,58 @@ export default function SettingsScreen() {
   const handleDarkModeToggle = (value: boolean) => {
     setDarkMode(value);
     setTheme(value ? "dark" : "light");
+  };
+
+  const handleNotificationsToggle = async (value: boolean) => {
+    setNotificationsEnabled(value);
+    if (value) {
+      const success = await scheduleDailyQuoteNotification(notificationHour, notificationMinute);
+      if (!success) {
+        setNotificationsEnabled(false);
+        Alert.alert('Error', 'Failed to enable notifications. Please check permissions.');
+      } else {
+        // Sync with server if user is logged in
+        if (user) {
+          await updateUserSettings(user.id, {
+            notificationsEnabled: true,
+            notificationHour,
+            notificationMinute,
+          });
+        }
+      }
+    } else {
+      await disableNotifications();
+      // Sync with server if user is logged in
+      if (user) {
+        await updateUserSettings(user.id, {
+          notificationsEnabled: false,
+        });
+      }
+    }
+  };
+
+  const handleNotificationTimeChange = async (hour: number, minute: number) => {
+    setNotificationHour(hour);
+    setNotificationMinute(minute);
+    if (notificationsEnabled) {
+      const success = await updateNotificationTime(hour, minute);
+      if (!success) {
+        Alert.alert('Error', 'Failed to update notification time.');
+      } else {
+        // Sync with server if user is logged in
+        if (user) {
+          await updateUserSettings(user.id, {
+            notificationHour: hour,
+            notificationMinute: minute,
+          });
+        }
+      }
+    }
+  };
+
+  const handleTestNotification = () => {
+    sendTestNotification();
+    Alert.alert('Test Notification', 'A test notification has been sent!');
   };
 
   const handleSignOut = async () => {
@@ -415,18 +489,80 @@ export default function SettingsScreen() {
                   },
                 ]}
               >
-                Quote of the Day
+                Daily Notifications
               </Text>
             </View>
             <Toggle
-              value={quoteOfTheDayEnabled}
-              onValueChange={setQuoteOfTheDayEnabled}
+              value={notificationsEnabled}
+              onValueChange={handleNotificationsToggle}
             />
           </View>
 
+          {notificationsEnabled && (
+            <View style={styles.settingRow}>
+              <View style={styles.settingLeft}>
+                <Ionicons name="time-outline" size={20} color={colors.text} />
+                <Text
+                  style={[
+                    styles.settingLabel,
+                    {
+                      color: colors.text,
+                      fontSize: labelFontSize,
+                    },
+                  ]}
+                >
+                  Notification Time
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={[
+                  styles.timeButton,
+                  {
+                    backgroundColor: colors.accent,
+                  },
+                ]}
+                onPress={() => {
+                  // Simple time picker - in a real app you'd use a proper time picker
+                  Alert.alert(
+                    'Set Notification Time',
+                    'Choose your preferred time for daily quote notifications',
+                    [
+                      {
+                        text: '8:00 AM',
+                        onPress: () => handleNotificationTimeChange(8, 0)
+                      },
+                      {
+                        text: '9:00 AM',
+                        onPress: () => handleNotificationTimeChange(9, 0)
+                      },
+                      {
+                        text: '12:00 PM',
+                        onPress: () => handleNotificationTimeChange(12, 0)
+                      },
+                      {
+                        text: '6:00 PM',
+                        onPress: () => handleNotificationTimeChange(18, 0)
+                      },
+                      {
+                        text: 'Cancel',
+                        style: 'cancel'
+                      }
+                    ]
+                  );
+                }}
+              >
+                <Text style={styles.timeButtonText}>
+                  {notificationHour.toString().padStart(2, '0')}:
+                  {notificationMinute.toString().padStart(2, '0')}
+                  {notificationHour >= 12 ? ' PM' : ' AM'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
           <View style={styles.settingRow}>
             <View style={styles.settingLeft}>
-              <Ionicons name="time-outline" size={20} color={colors.text} />
+              <Ionicons name="paper-plane-outline" size={20} color={colors.text} />
               <Text
                 style={[
                   styles.settingLabel,
@@ -436,18 +572,30 @@ export default function SettingsScreen() {
                   },
                 ]}
               >
-                Reminder Time
+                Test Notification
               </Text>
             </View>
             <TouchableOpacity
               style={[
-                styles.timeButton,
+                styles.testButton,
                 {
-                  backgroundColor: colors.accent,
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
                 },
               ]}
+              onPress={handleTestNotification}
             >
-              <Text style={styles.timeButtonText}>{reminderTime}</Text>
+              <Text
+                style={[
+                  styles.testButtonText,
+                  {
+                    color: colors.accent,
+                    fontSize: labelFontSize,
+                  },
+                ]}
+              >
+                Send Test
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -717,6 +865,16 @@ const styles = StyleSheet.create({
   timeButtonText: {
     color: "#FFFFFF",
     fontSize: 14,
+    fontWeight: "600",
+  },
+  testButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    borderWidth: 1,
+  },
+  testButtonText: {
+    fontSize: 12,
     fontWeight: "600",
   },
   version: {

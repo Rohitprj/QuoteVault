@@ -3,6 +3,11 @@ import { ThemeProvider } from "../contexts/ThemeContext";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider, useAuth } from "../contexts/AuthContext";
 import React, { useEffect } from "react";
+import * as Notifications from "expo-notifications";
+import {
+  initializeNotifications,
+  handleNotificationResponse,
+} from "../services/notificationsService";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -11,6 +16,18 @@ function RootLayoutNav() {
   const { session, isLoading } = useAuth();
   console.log("Session", JSON.stringify(session, null, 2));
   const router = useRouter();
+
+  useEffect(() => {
+    // Initialize notifications
+    initializeNotifications();
+
+    // Handle notification responses
+    const subscription = Notifications.addNotificationResponseReceivedListener(
+      handleNotificationResponse
+    );
+
+    return () => subscription.remove();
+  }, []);
 
   useEffect(() => {
     if (!isLoading) {

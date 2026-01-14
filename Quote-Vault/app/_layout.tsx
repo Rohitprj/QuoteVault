@@ -2,20 +2,27 @@ import { SplashScreen, Stack, useRouter } from "expo-router";
 import { ThemeProvider } from "../contexts/ThemeContext";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider, useAuth } from "../contexts/AuthContext";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import * as Notifications from "expo-notifications";
 import {
   initializeNotifications,
   handleNotificationResponse,
 } from "../services/notificationsService";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+import AdvancedSplash from "../components/AdvancedSplash";
+
+// Keep native splash visible
 SplashScreen.preventAutoHideAsync();
+
+// This flag ensures SplashScreen.hideAsync() is called only once
+let appIsReady = false;
 
 function RootLayoutNav() {
   const { session, isLoading } = useAuth();
-  console.log("Session", JSON.stringify(session, null, 2));
   const router = useRouter();
+
+  // State to control visibility of AdvancedSplash
+  const [showAnimatedSplash, setShowAnimatedSplash] = useState(true);
 
   useEffect(() => {
     // Initialize notifications
@@ -30,22 +37,36 @@ function RootLayoutNav() {
   }, []);
 
   useEffect(() => {
+    // This effect runs when auth loading is done or session changes
     if (!isLoading) {
-      if (session) {
-        // User is signed in
-        router.replace("/(tabs)/home");
-      } else {
-        // User is not signed in
-        router.replace("/sign-in");
-      }
-      SplashScreen.hideAsync();
-    }
-  }, [session, isLoading]);
+      const timer = setTimeout(
+        async () => {
+          // Only hide the native splash if the app hasn't been deemed ready yet
+          if (!appIsReady) {
+            await SplashScreen.hideAsync();
+            appIsReady = true; // Mark app as ready
+          }
+          setShowAnimatedSplash(false); // Hide our animated splash
 
-  if (isLoading) {
-    return null; // Or a loading spinner
+          if (session) {
+            router.replace("/(tabs)/home");
+          } else {
+            router.replace("/sign-in");
+          }
+        },
+        showAnimatedSplash ? 2600 : 0
+      ); // Play animation for 2.6s only on first load, then immediately
+
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, session, showAnimatedSplash]);
+
+  // While loading auth or showing animated splash, display the AdvancedSplash component
+  if (isLoading || showAnimatedSplash) {
+    return <AdvancedSplash />;
   }
 
+  // Once loading is complete and animated splash is hidden, render the main app
   return (
     <SafeAreaProvider>
       <ThemeProvider>
@@ -80,139 +101,3 @@ export default function RootLayout() {
     </AuthProvider>
   );
 }
-
-// import { SplashScreen, Stack, useRouter } from "expo-router";
-// import { ThemeProvider } from "../contexts/ThemeContext";
-// import { SafeAreaProvider } from "react-native-safe-area-context";
-// import { AuthProvider, useAuth } from "../contexts/AuthContext";
-// import React, { useEffect, useState } from "react";
-// import AdvancedSplash from "@/components/AdvancedSplash";
-
-// // Keep native splash visible
-// SplashScreen.preventAutoHideAsync();
-
-// function RootLayoutNav() {
-//   const { session, isLoading } = useAuth();
-//   const router = useRouter();
-
-//   const [showAnimatedSplash, setShowAnimatedSplash] = useState(true);
-
-//   useEffect(() => {
-//     if (!isLoading) {
-//       // Show animated splash for fixed duration
-//       const timer = setTimeout(async () => {
-//         setShowAnimatedSplash(false);
-//         await SplashScreen.hideAsync();
-
-//         if (session) {
-//           router.replace("/(tabs)/home");
-//         } else {
-//           router.replace("/sign-in");
-//         }
-//       }, 2600); // ⏱ match animation duration
-
-//       return () => clearTimeout(timer);
-//     }
-//   }, [isLoading, session]);
-
-//   // 1️⃣ While auth loading OR splash animation → show splash
-//   if (isLoading || showAnimatedSplash) {
-//     return <AdvancedSplash />;
-//   }
-
-//   // 2️⃣ After splash → render app routes
-//   return (
-//     <SafeAreaProvider>
-//       <ThemeProvider>
-//         <Stack
-//           screenOptions={{
-//             headerShown: false,
-//             contentStyle: { backgroundColor: "transparent" },
-//           }}
-//         >
-//           <Stack.Screen name="sign-in" />
-//           <Stack.Screen name="sign-up" />
-//           <Stack.Screen name="(tabs)" />
-//           <Stack.Screen name="profile" />
-//           <Stack.Screen name="customize-quote" />
-//           <Stack.Screen name="reset-password" />
-//         </Stack>
-//       </ThemeProvider>
-//     </SafeAreaProvider>
-//   );
-// }
-
-// export default function RootLayout() {
-//   return (
-//     <AuthProvider>
-//       <RootLayoutNav />
-//     </AuthProvider>
-//   );
-// }
-
-// import { SplashScreen, Stack, useRouter } from "expo-router";
-// import { ThemeProvider } from "../contexts/ThemeContext";
-// import { SafeAreaProvider } from "react-native-safe-area-context";
-// import { AuthProvider, useAuth } from "../contexts/AuthContext";
-// import React, { useEffect, useState } from "react";
-// import AdvancedSplash from "@/components/AdvancedSplash";
-
-// // 🔒 GLOBAL FLAG (persists across re-renders)
-// let hasShownSplash = false;
-
-// // Keep native splash visible
-// SplashScreen.preventAutoHideAsync();
-
-// function RootLayoutNav() {
-//   const { session, isLoading } = useAuth();
-//   const router = useRouter();
-
-//   const [showAnimatedSplash, setShowAnimatedSplash] = useState(!hasShownSplash);
-
-//   useEffect(() => {
-//     if (!isLoading && !hasShownSplash) {
-//       hasShownSplash = true;
-
-//       const timer = setTimeout(async () => {
-//         setShowAnimatedSplash(false);
-//         await SplashScreen.hideAsync();
-
-//         if (session) {
-//           router.replace("/(tabs)/home");
-//         } else {
-//           router.replace("/sign-in");
-//         }
-//       }, 2600);
-
-//       return () => clearTimeout(timer);
-//     }
-//   }, [isLoading, session]);
-
-//   // 🔥 Show splash ONLY ONCE
-//   if (showAnimatedSplash || isLoading) {
-//     return <AdvancedSplash />;
-//   }
-
-//   return (
-//     <SafeAreaProvider>
-//       <ThemeProvider>
-//         <Stack screenOptions={{ headerShown: false }}>
-//           <Stack.Screen name="sign-in" />
-//           <Stack.Screen name="sign-up" />
-//           <Stack.Screen name="(tabs)" />
-//           <Stack.Screen name="profile" />
-//           <Stack.Screen name="customize-quote" />
-//           <Stack.Screen name="reset-password" />
-//         </Stack>
-//       </ThemeProvider>
-//     </SafeAreaProvider>
-//   );
-// }
-
-// export default function RootLayout() {
-//   return (
-//     <AuthProvider>
-//       <RootLayoutNav />
-//     </AuthProvider>
-//   );
-// }

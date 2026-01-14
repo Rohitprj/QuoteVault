@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -20,6 +20,8 @@ import {
 import { Toggle } from "../../components/ui/Toggle";
 import { useAuth } from "../../contexts/AuthContext"; // Import useAuth
 import { Button } from "../../components/ui/Button"; // Import Button
+import * as ImagePicker from 'expo-image-picker'; // Import ImagePicker
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 
 const accentColors: { name: AccentColor; color: string }[] = [
   { name: "blue", color: "#007AFF" },
@@ -28,6 +30,8 @@ const accentColors: { name: AccentColor; color: string }[] = [
   { name: "red", color: "#FF3B30" },
   { name: "orange", color: "#FF9500" },
 ];
+
+const PROFILE_IMAGE_KEY = 'user_profile_image'; // Key for AsyncStorage
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -42,11 +46,43 @@ export default function SettingsScreen() {
     setTextSize,
   } = useTheme();
   const insets = useSafeAreaInsets();
-  const { signOut } = useAuth(); // Destructure signOut from useAuth
+  const { signOut, user } = useAuth(); // Destructure signOut and user from useAuth
   const [loading, setLoading] = useState(false); // Add loading state
   const [darkMode, setDarkMode] = useState(theme === "dark");
   const [quoteOfTheDayEnabled, setQuoteOfTheDayEnabled] = useState(true);
   const [reminderTime] = useState("08:30 AM");
+  const [profileImageUri, setProfileImageUri] = useState<string | null>(null); // State for profile image
+
+  // Load profile image from AsyncStorage on mount
+  useEffect(() => {
+    const loadProfileImage = async () => {
+      try {
+        const storedUri = await AsyncStorage.getItem(PROFILE_IMAGE_KEY);
+        if (storedUri) {
+          setProfileImageUri(storedUri);
+        }
+      } catch (e) {
+        console.error("Failed to load profile image:", e);
+      }
+    };
+    loadProfileImage();
+  }, []);
+
+  // Save profile image to AsyncStorage whenever it changes
+  useEffect(() => {
+    const saveProfileImage = async () => {
+      try {
+        if (profileImageUri) {
+          await AsyncStorage.setItem(PROFILE_IMAGE_KEY, profileImageUri);
+        } else {
+          await AsyncStorage.removeItem(PROFILE_IMAGE_KEY);
+        }
+      } catch (e) {
+        console.error("Failed to save profile image:", e);
+      }
+    };
+    saveProfileImage();
+  }, [profileImageUri]);
 
   const handleDarkModeToggle = (value: boolean) => {
     setDarkMode(value);
@@ -64,11 +100,35 @@ export default function SettingsScreen() {
           const { error } = await signOut();
           if (error) {
             Alert.alert("Logout Error", error.message);
+          } else {
+            // Clear profile image from AsyncStorage on logout
+            await AsyncStorage.removeItem(PROFILE_IMAGE_KEY);
+            setProfileImageUri(null);
           }
           setLoading(false);
         },
       },
     ]);
+  };
+
+  const pickImage = async () => {
+    // Request permission to access media library
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Required', 'Please grant media library access to select a profile image.');
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setProfileImageUri(result.assets[0].uri);
+    }
   };
 
   const sectionTitleFontSize =
@@ -108,12 +168,17 @@ export default function SettingsScreen() {
 
         {/* Profile Section */}
         <View style={styles.profileSection}>
-          <Image
-            source={{
-              uri: "https://i.pravatar.cc/150?img=33",
-            }}
-            style={styles.profileAvatar}
-          />
+          <TouchableOpacity onPress={pickImage}>
+            <Image
+              source={{
+                uri: profileImageUri || "https://i.pravatar.cc/150?img=33", // Default avatar
+              }}
+              style={styles.profileAvatar}
+            />
+             <View style={[styles.cameraIconContainer, { backgroundColor: colors.accent }]}>
+              <Ionicons name="camera" size={20} color="#FFFFFF" />
+            </View>
+          </TouchableOpacity>
           <Text
             style={[
               styles.profileName,
@@ -123,7 +188,7 @@ export default function SettingsScreen() {
               },
             ]}
           >
-            Marcus Aurelius
+            {user?.email ? user.email.split('@')[0] : "Guest User"}
           </Text>
           <Text
             style={[
@@ -134,7 +199,7 @@ export default function SettingsScreen() {
               },
             ]}
           >
-            marcus.app@stoic.com
+            {user?.email || "No email provided"}
           </Text>
           <TouchableOpacity
             style={[
@@ -530,6 +595,18 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
     marginBottom: 16,
+  },
+  cameraIconContainer: {
+    position: 'absolute',
+    bottom: 12,
+    right: 0,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
   },
   profileName: {
     fontWeight: "700",

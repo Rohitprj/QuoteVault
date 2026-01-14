@@ -12,7 +12,10 @@ import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useTheme } from "../../contexts/ThemeContext";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { QuoteCard } from "../../components/quote/QuoteCard";
 import { mockQuotes, categories } from "../../data/mockData";
 
@@ -50,13 +53,15 @@ export default function DiscoverScreen() {
     textSize === "small" ? 20 : textSize === "large" ? 28 : 24;
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <StatusBar style={isDark ? "light" : "dark"} />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={{
           paddingBottom: 100,
-          paddingTop: insets.top,
+          // paddingTop: insets.top,
         }}
         showsVerticalScrollIndicator={false}
       >
@@ -132,7 +137,11 @@ export default function DiscoverScreen() {
                     {
                       color: colors.text,
                       fontSize:
-                        textSize === "small" ? 16 : textSize === "large" ? 22 : 18,
+                        textSize === "small"
+                          ? 16
+                          : textSize === "large"
+                          ? 22
+                          : 18,
                     },
                   ]}
                 >
@@ -144,7 +153,11 @@ export default function DiscoverScreen() {
                     {
                       color: colors.textSecondary,
                       fontSize:
-                        textSize === "small" ? 12 : textSize === "large" ? 16 : 14,
+                        textSize === "small"
+                          ? 12
+                          : textSize === "large"
+                          ? 16
+                          : 14,
                     },
                   ]}
                 >
@@ -269,9 +282,18 @@ export default function DiscoverScreen() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {[
               { name: "Steve Jobs", image: "https://i.pravatar.cc/150?img=12" },
-              { name: "Winston Churchill", image: "https://i.pravatar.cc/150?img=33" },
-              { name: "Marcus Aurelius", image: "https://i.pravatar.cc/150?img=45" },
-              { name: "Theodore Roosevelt", image: "https://i.pravatar.cc/150?img=67" },
+              {
+                name: "Winston Churchill",
+                image: "https://i.pravatar.cc/150?img=33",
+              },
+              {
+                name: "Marcus Aurelius",
+                image: "https://i.pravatar.cc/150?img=45",
+              },
+              {
+                name: "Theodore Roosevelt",
+                image: "https://i.pravatar.cc/150?img=67",
+              },
             ].map((author, index) => (
               <TouchableOpacity
                 key={index}
@@ -293,7 +315,11 @@ export default function DiscoverScreen() {
                     {
                       color: colors.text,
                       fontSize:
-                        textSize === "small" ? 12 : textSize === "large" ? 16 : 14,
+                        textSize === "small"
+                          ? 12
+                          : textSize === "large"
+                          ? 16
+                          : 14,
                     },
                   ]}
                 >
@@ -304,7 +330,7 @@ export default function DiscoverScreen() {
           </ScrollView>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 

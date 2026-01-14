@@ -12,7 +12,10 @@ import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useTheme } from "../../contexts/ThemeContext";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { mockQuotes, mockCollections } from "../../data/mockData";
 
 const { width } = Dimensions.get("window");
@@ -42,13 +45,15 @@ export default function LibraryScreen() {
     textSize === "small" ? 20 : textSize === "large" ? 28 : 24;
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <StatusBar style={isDark ? "light" : "dark"} />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={{
           paddingBottom: 100,
-          paddingTop: insets.top,
+          // paddingTop: insets.top,
         }}
         showsVerticalScrollIndicator={false}
       >
@@ -268,7 +273,7 @@ export default function LibraryScreen() {
       >
         <Ionicons name="add" size={28} color="#FFFFFF" />
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }
 

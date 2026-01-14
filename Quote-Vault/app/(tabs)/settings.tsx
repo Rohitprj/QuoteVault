@@ -12,7 +12,10 @@ import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme, AccentColor, TextSize } from "../../contexts/ThemeContext";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { Toggle } from "../../components/ui/Toggle";
 
 const accentColors: { name: AccentColor; color: string }[] = [
@@ -64,13 +67,15 @@ export default function SettingsScreen() {
     textSize === "small" ? 14 : textSize === "large" ? 20 : 16;
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <StatusBar style={isDark ? "light" : "dark"} />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={{
           paddingBottom: 100,
-          paddingTop: insets.top,
+          // paddingTop: insets.top,
         }}
         showsVerticalScrollIndicator={false}
       >
@@ -488,7 +493,7 @@ export default function SettingsScreen() {
           Version 2.4.0 (Stoic Edition)
         </Text>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 

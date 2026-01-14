@@ -1,20 +1,33 @@
-import React from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../contexts/ThemeContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAuth } from "../contexts/AuthContext"; // Import useAuth
+import { Button } from "../components/ui/Button"; // Import Button component
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { colors, textSize, isDark } = useTheme();
   const insets = useSafeAreaInsets();
+  const { user, signOut } = useAuth(); // Destructure user and signOut from useAuth
+  const [loading, setLoading] = useState(false);
 
   const titleFontSize =
     textSize === "small" ? 20 : textSize === "large" ? 28 : 24;
   const labelFontSize =
     textSize === "small" ? 14 : textSize === "large" ? 20 : 16;
+
+  const handleLogout = async () => {
+    setLoading(true);
+    const { error } = await signOut();
+    if (error) {
+      Alert.alert("Logout Error", error.message);
+    }
+    setLoading(false);
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -53,7 +66,7 @@ export default function ProfileScreen() {
         <View style={styles.profileSection}>
           <Image
             source={{
-              uri: "https://i.pravatar.cc/150?img=33",
+              uri: "https://i.pravatar.cc/150?img=33", // Placeholder avatar
             }}
             style={styles.profileAvatar}
           />
@@ -66,7 +79,7 @@ export default function ProfileScreen() {
               },
             ]}
           >
-            Marcus Aurelius
+            {user?.email ? user.email.split('@')[0] : "Guest User"}
           </Text>
           <Text
             style={[
@@ -77,7 +90,7 @@ export default function ProfileScreen() {
               },
             ]}
           >
-            marcus.app@stoic.com
+            {user?.email || "No email provided"}
           </Text>
         </View>
 
@@ -158,6 +171,15 @@ export default function ProfileScreen() {
             </Text>
           </View>
         </View>
+        <View style={styles.logoutButtonContainer}>
+          <Button
+            title={loading ? <ActivityIndicator color={colors.text} /> : "Logout"}
+            onPress={handleLogout}
+            variant="secondary"
+            size="large"
+            disabled={loading}
+          />
+        </View>
       </ScrollView>
     </View>
   );
@@ -226,5 +248,9 @@ const styles = StyleSheet.create({
   statDivider: {
     width: 1,
     backgroundColor: "rgba(255, 255, 255, 0.1)",
+  },
+  logoutButtonContainer: {
+    paddingHorizontal: 20,
+    marginTop: 30,
   },
 });

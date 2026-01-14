@@ -54,7 +54,7 @@ export default function SettingsScreen() {
       {
         text: "Sign Out",
         style: "destructive",
-        onPress: () => router.push("/sign-in"),
+        onPress: () => router.replace("/sign-in"),
       },
     ]);
   };

@@ -8,6 +8,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   ImageBackground,
+  ActivityIndicator, // Import ActivityIndicator for loading state
+  Alert, // Import Alert for displaying messages
 } from "react-native";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -16,18 +18,52 @@ import { useTheme } from "../contexts/ThemeContext";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAuth } from "../contexts/AuthContext"; // Import useAuth
 
 export default function SignInScreen() {
   const router = useRouter();
   const { colors, textSize, isDark } = useTheme();
   const insets = useSafeAreaInsets();
+  const { signIn, resetPassword } = useAuth(); // Destructure signIn and resetPassword from useAuth
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false); // State for loading indicator
+  const [error, setError] = useState<string | null>(null); // State for error messages
 
   const headingFontSize =
     textSize === "small" ? 28 : textSize === "large" ? 36 : 32;
   const subheadingFontSize =
     textSize === "small" ? 14 : textSize === "large" ? 18 : 16;
+
+  const handleSignIn = async () => {
+    setLoading(true);
+    setError(null);
+    const { error } = await signIn(email, password);
+    if (error) {
+      setError(error.message);
+      Alert.alert("Sign In Error", error.message); // Display error message
+    }
+    setLoading(false);
+  };
+
+  const handleResetPassword = async () => {
+    setError(null);
+    if (!email) {
+      setError("Please enter your email to reset password.");
+      Alert.alert("Error", "Please enter your email to reset password.");
+      return;
+    }
+    setLoading(true);
+    const { error } = await resetPassword(email);
+    if (error) {
+      setError(error.message);
+      Alert.alert("Password Reset Error", error.message);
+    } else {
+      Alert.alert("Password Reset", "Check your email for the password reset link.");
+    }
+    setLoading(false);
+  };
 
   return (
     <KeyboardAvoidingView
@@ -84,6 +120,7 @@ export default function SignInScreen() {
           </View>
 
           <View style={styles.form}>
+            {error && <Text style={{ color: "red", marginBottom: 10 }}>{error}</Text>}
             <Input
               label="Email"
               placeholder="Enter your email"
@@ -91,6 +128,7 @@ export default function SignInScreen() {
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
+              editable={!loading} // Disable input when loading
             />
 
             <Input
@@ -99,9 +137,10 @@ export default function SignInScreen() {
               value={password}
               onChangeText={setPassword}
               secureTextEntry
+              editable={!loading} // Disable input when loading
             />
 
-            <TouchableOpacity style={styles.forgotPassword}>
+            <TouchableOpacity style={styles.forgotPassword} onPress={handleResetPassword} disabled={loading}>
               <Text
                 style={[styles.forgotPasswordText, { color: colors.accent }]}
               >
@@ -110,11 +149,12 @@ export default function SignInScreen() {
             </TouchableOpacity>
 
             <Button
-              title="Sign In"
-              onPress={() => router.push("/(tabs)/home")}
+              title={loading ? <ActivityIndicator color={colors.text} /> : "Sign In"}
+              onPress={handleSignIn}
               variant="primary"
               size="large"
               style={styles.signInButton}
+              disabled={loading} // Disable button when loading
             />
 
             <View style={styles.divider}>
@@ -138,6 +178,7 @@ export default function SignInScreen() {
                   { backgroundColor: colors.surface },
                 ]}
                 activeOpacity={0.7}
+                disabled={loading}
               >
                 <Ionicons name="logo-apple" size={24} color={colors.text} />
                 <Text style={[styles.socialButtonText, { color: colors.text }]}>
@@ -151,6 +192,7 @@ export default function SignInScreen() {
                   { backgroundColor: colors.surface },
                 ]}
                 activeOpacity={0.7}
+                disabled={loading}
               >
                 <Ionicons name="logo-google" size={24} color={colors.text} />
                 <Text style={[styles.socialButtonText, { color: colors.text }]}>
@@ -165,7 +207,7 @@ export default function SignInScreen() {
               >
                 Don&apos;t have an account?{" "}
               </Text>
-              <TouchableOpacity onPress={() => router.push("/sign-up")}>
+              <TouchableOpacity onPress={() => router.push("/sign-up")} disabled={loading}>
                 <Text style={[styles.footerLink, { color: colors.accent }]}>
                   Sign Up
                 </Text>

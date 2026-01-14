@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   View,
   Text,
@@ -60,7 +60,10 @@ export default function SignInScreen() {
       setError(error.message);
       Alert.alert("Password Reset Error", error.message);
     } else {
-      Alert.alert("Password Reset", "Check your email for the password reset link.");
+      Alert.alert(
+        "Password Reset",
+        "Check your email for the password reset link."
+      );
     }
     setLoading(false);
   };
@@ -120,7 +123,9 @@ export default function SignInScreen() {
           </View>
 
           <View style={styles.form}>
-            {error && <Text style={{ color: "red", marginBottom: 10 }}>{error}</Text>}
+            {error && (
+              <Text style={{ color: "red", marginBottom: 10 }}>{error}</Text>
+            )}
             <Input
               label="Email"
               placeholder="Enter your email"
@@ -140,7 +145,11 @@ export default function SignInScreen() {
               editable={!loading} // Disable input when loading
             />
 
-            <TouchableOpacity style={styles.forgotPassword} onPress={handleResetPassword} disabled={loading}>
+            <TouchableOpacity
+              style={styles.forgotPassword}
+              onPress={handleResetPassword}
+              disabled={loading}
+            >
               <Text
                 style={[styles.forgotPasswordText, { color: colors.accent }]}
               >
@@ -149,7 +158,9 @@ export default function SignInScreen() {
             </TouchableOpacity>
 
             <Button
-              title={loading ? <ActivityIndicator color={colors.text} /> : "Sign In"}
+              title={
+                loading ? <ActivityIndicator color={colors.text} /> : "Sign In"
+              }
               onPress={handleSignIn}
               variant="primary"
               size="large"
@@ -207,7 +218,10 @@ export default function SignInScreen() {
               >
                 Don&apos;t have an account?{" "}
               </Text>
-              <TouchableOpacity onPress={() => router.push("/sign-up")} disabled={loading}>
+              <TouchableOpacity
+                onPress={() => router.push("/sign-up")}
+                disabled={loading}
+              >
                 <Text style={[styles.footerLink, { color: colors.accent }]}>
                   Sign Up
                 </Text>

@@ -61,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "quotevault://*reset-password", // This needs to be a deep link handled by your app
+      redirectTo: "quotevault://reset-password", // This needs to be a deep link handled by your app
     });
     return { error };
   };

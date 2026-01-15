@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../contexts/ThemeContext';
+import { ShareQuoteModal } from './ShareQuoteModal';
 
 interface QuoteCardProps {
   quote: string;
@@ -25,6 +26,7 @@ export const QuoteCard: React.FC<QuoteCardProps> = ({
   style,
 }) => {
   const { colors, textSize } = useTheme();
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const quoteFontSize = textSize === 'small' ? 16 : textSize === 'large' ? 22 : 18;
   const authorFontSize = textSize === 'small' ? 12 : textSize === 'large' ? 16 : 14;
@@ -43,13 +45,22 @@ export const QuoteCard: React.FC<QuoteCardProps> = ({
     >
       <View style={styles.header}>
         <Ionicons name="chatbubbles" size={32} color={colors.accent} />
-        <TouchableOpacity onPress={onLike} activeOpacity={0.7}>
-          <Ionicons
-            name={isLiked ? 'heart' : 'heart-outline'}
-            size={24}
-            color={isLiked ? colors.accent : colors.textSecondary}
-          />
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            onPress={() => setShowShareModal(true)}
+            activeOpacity={0.7}
+            style={styles.actionButton}
+          >
+            <Ionicons name="share-outline" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onLike} activeOpacity={0.7} style={styles.actionButton}>
+            <Ionicons
+              name={isLiked ? 'heart' : 'heart-outline'}
+              size={20}
+              color={isLiked ? colors.accent : colors.textSecondary}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <Text
@@ -100,6 +111,13 @@ export const QuoteCard: React.FC<QuoteCardProps> = ({
           </View>
         </View>
       </View>
+
+      <ShareQuoteModal
+        visible={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        quote={quote}
+        author={author}
+      />
     </View>
   );
 };
@@ -116,6 +134,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 12,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  actionButton: {
+    padding: 4,
   },
   quote: {
     fontStyle: 'italic',

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  ActivityIndicator, // Import ActivityIndicator
 } from "react-native";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -17,6 +18,18 @@ import {
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import { Toggle } from "../../components/ui/Toggle";
+import { useAuth } from "../../contexts/AuthContext"; // Import useAuth
+import { Button } from "../../components/ui/Button"; // Import Button
+import * as ImagePicker from 'expo-image-picker'; // Import ImagePicker
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
+import {
+  scheduleDailyQuoteNotification,
+  disableNotifications,
+  getNotificationSettings,
+  updateNotificationTime,
+  sendTestNotification
+} from '../../services/notificationsService';
+import { updateUserSettings } from '../../services/profileService';
 
 const accentColors: { name: AccentColor; color: string }[] = [
   { name: "blue", color: "#007AFF" },
@@ -25,6 +38,8 @@ const accentColors: { name: AccentColor; color: string }[] = [
   { name: "red", color: "#FF3B30" },
   { name: "orange", color: "#FF9500" },
 ];
+
+const PROFILE_IMAGE_KEY = 'user_profile_image'; // Key for AsyncStorage
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -39,24 +54,155 @@ export default function SettingsScreen() {
     setTextSize,
   } = useTheme();
   const insets = useSafeAreaInsets();
+  const { signOut, user } = useAuth(); // Destructure signOut and user from useAuth
+  const [loading, setLoading] = useState(false); // Add loading state
   const [darkMode, setDarkMode] = useState(theme === "dark");
-  const [quoteOfTheDayEnabled, setQuoteOfTheDayEnabled] = useState(true);
-  const [reminderTime] = useState("08:30 AM");
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [notificationHour, setNotificationHour] = useState(9);
+  const [notificationMinute, setNotificationMinute] = useState(0);
+  const [profileImageUri, setProfileImageUri] = useState<string | null>(null); // State for profile image
+
+  // Load profile image from AsyncStorage on mount
+  useEffect(() => {
+    const loadProfileImage = async () => {
+      try {
+        const storedUri = await AsyncStorage.getItem(PROFILE_IMAGE_KEY);
+        if (storedUri) {
+          setProfileImageUri(storedUri);
+        }
+      } catch (e) {
+        console.error("Failed to load profile image:", e);
+      }
+    };
+    loadProfileImage();
+  }, []);
+
+  // Load notification settings
+  useEffect(() => {
+    const loadNotificationSettings = async () => {
+      const settings = await getNotificationSettings();
+      if (settings) {
+        setNotificationsEnabled(settings.enabled);
+        setNotificationHour(settings.hour);
+        setNotificationMinute(settings.minute);
+      }
+    };
+    loadNotificationSettings();
+  }, []);
+
+  // Save profile image to AsyncStorage whenever it changes
+  useEffect(() => {
+    const saveProfileImage = async () => {
+      try {
+        if (profileImageUri) {
+          await AsyncStorage.setItem(PROFILE_IMAGE_KEY, profileImageUri);
+        } else {
+          await AsyncStorage.removeItem(PROFILE_IMAGE_KEY);
+        }
+      } catch (e) {
+        console.error("Failed to save profile image:", e);
+      }
+    };
+    saveProfileImage();
+  }, [profileImageUri]);
 
   const handleDarkModeToggle = (value: boolean) => {
     setDarkMode(value);
     setTheme(value ? "dark" : "light");
   };
 
-  const handleSignOut = () => {
+  const handleNotificationsToggle = async (value: boolean) => {
+    setNotificationsEnabled(value);
+    if (value) {
+      const success = await scheduleDailyQuoteNotification(notificationHour, notificationMinute);
+      if (!success) {
+        setNotificationsEnabled(false);
+        Alert.alert('Error', 'Failed to enable notifications. Please check permissions.');
+      } else {
+        // Sync with server if user is logged in
+        if (user) {
+          await updateUserSettings(user.id, {
+            notificationsEnabled: true,
+            notificationHour,
+            notificationMinute,
+          });
+        }
+      }
+    } else {
+      await disableNotifications();
+      // Sync with server if user is logged in
+      if (user) {
+        await updateUserSettings(user.id, {
+          notificationsEnabled: false,
+        });
+      }
+    }
+  };
+
+  const handleNotificationTimeChange = async (hour: number, minute: number) => {
+    setNotificationHour(hour);
+    setNotificationMinute(minute);
+    if (notificationsEnabled) {
+      const success = await updateNotificationTime(hour, minute);
+      if (!success) {
+        Alert.alert('Error', 'Failed to update notification time.');
+      } else {
+        // Sync with server if user is logged in
+        if (user) {
+          await updateUserSettings(user.id, {
+            notificationHour: hour,
+            notificationMinute: minute,
+          });
+        }
+      }
+    }
+  };
+
+  const handleTestNotification = () => {
+    sendTestNotification();
+    Alert.alert('Test Notification', 'A test notification has been sent!');
+  };
+
+  const handleSignOut = async () => {
     Alert.alert("Sign Out", "Are you sure you want to sign out?", [
       { text: "Cancel", style: "cancel" },
       {
         text: "Sign Out",
         style: "destructive",
-        onPress: () => router.push("/sign-in"),
+        onPress: async () => {
+          setLoading(true);
+          const { error } = await signOut();
+          if (error) {
+            Alert.alert("Logout Error", error.message);
+          } else {
+            // Clear profile image from AsyncStorage on logout
+            await AsyncStorage.removeItem(PROFILE_IMAGE_KEY);
+            setProfileImageUri(null);
+          }
+          setLoading(false);
+        },
       },
     ]);
+  };
+
+  const pickImage = async () => {
+    // Request permission to access media library
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Required', 'Please grant media library access to select a profile image.');
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setProfileImageUri(result.assets[0].uri);
+    }
   };
 
   const sectionTitleFontSize =
@@ -96,12 +242,17 @@ export default function SettingsScreen() {
 
         {/* Profile Section */}
         <View style={styles.profileSection}>
-          <Image
-            source={{
-              uri: "https://i.pravatar.cc/150?img=33",
-            }}
-            style={styles.profileAvatar}
-          />
+          <TouchableOpacity onPress={pickImage}>
+            <Image
+              source={{
+                uri: profileImageUri || "https://i.pravatar.cc/150?img=33", // Default avatar
+              }}
+              style={styles.profileAvatar}
+            />
+             <View style={[styles.cameraIconContainer, { backgroundColor: colors.accent }]}>
+              <Ionicons name="camera" size={20} color="#FFFFFF" />
+            </View>
+          </TouchableOpacity>
           <Text
             style={[
               styles.profileName,
@@ -111,7 +262,7 @@ export default function SettingsScreen() {
               },
             ]}
           >
-            Marcus Aurelius
+            {user?.email ? user.email.split('@')[0] : "Guest User"}
           </Text>
           <Text
             style={[
@@ -122,7 +273,7 @@ export default function SettingsScreen() {
               },
             ]}
           >
-            marcus.app@stoic.com
+            {user?.email || "No email provided"}
           </Text>
           <TouchableOpacity
             style={[
@@ -338,18 +489,80 @@ export default function SettingsScreen() {
                   },
                 ]}
               >
-                Quote of the Day
+                Daily Notifications
               </Text>
             </View>
             <Toggle
-              value={quoteOfTheDayEnabled}
-              onValueChange={setQuoteOfTheDayEnabled}
+              value={notificationsEnabled}
+              onValueChange={handleNotificationsToggle}
             />
           </View>
 
+          {notificationsEnabled && (
+            <View style={styles.settingRow}>
+              <View style={styles.settingLeft}>
+                <Ionicons name="time-outline" size={20} color={colors.text} />
+                <Text
+                  style={[
+                    styles.settingLabel,
+                    {
+                      color: colors.text,
+                      fontSize: labelFontSize,
+                    },
+                  ]}
+                >
+                  Notification Time
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={[
+                  styles.timeButton,
+                  {
+                    backgroundColor: colors.accent,
+                  },
+                ]}
+                onPress={() => {
+                  // Simple time picker - in a real app you'd use a proper time picker
+                  Alert.alert(
+                    'Set Notification Time',
+                    'Choose your preferred time for daily quote notifications',
+                    [
+                      {
+                        text: '8:00 AM',
+                        onPress: () => handleNotificationTimeChange(8, 0)
+                      },
+                      {
+                        text: '9:00 AM',
+                        onPress: () => handleNotificationTimeChange(9, 0)
+                      },
+                      {
+                        text: '12:00 PM',
+                        onPress: () => handleNotificationTimeChange(12, 0)
+                      },
+                      {
+                        text: '6:00 PM',
+                        onPress: () => handleNotificationTimeChange(18, 0)
+                      },
+                      {
+                        text: 'Cancel',
+                        style: 'cancel'
+                      }
+                    ]
+                  );
+                }}
+              >
+                <Text style={styles.timeButtonText}>
+                  {notificationHour.toString().padStart(2, '0')}:
+                  {notificationMinute.toString().padStart(2, '0')}
+                  {notificationHour >= 12 ? ' PM' : ' AM'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
           <View style={styles.settingRow}>
             <View style={styles.settingLeft}>
-              <Ionicons name="time-outline" size={20} color={colors.text} />
+              <Ionicons name="paper-plane-outline" size={20} color={colors.text} />
               <Text
                 style={[
                   styles.settingLabel,
@@ -359,18 +572,30 @@ export default function SettingsScreen() {
                   },
                 ]}
               >
-                Reminder Time
+                Test Notification
               </Text>
             </View>
             <TouchableOpacity
               style={[
-                styles.timeButton,
+                styles.testButton,
                 {
-                  backgroundColor: colors.accent,
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
                 },
               ]}
+              onPress={handleTestNotification}
             >
-              <Text style={styles.timeButtonText}>{reminderTime}</Text>
+              <Text
+                style={[
+                  styles.testButtonText,
+                  {
+                    color: colors.accent,
+                    fontSize: labelFontSize,
+                  },
+                ]}
+              >
+                Send Test
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -465,19 +690,15 @@ export default function SettingsScreen() {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.settingRow} onPress={handleSignOut}>
-            <Text
-              style={[
-                styles.settingLabel,
-                {
-                  color: "#FF3B30",
-                  fontSize: labelFontSize,
-                },
-              ]}
-            >
-              Sign Out
-            </Text>
-          </TouchableOpacity>
+          <View style={{ paddingHorizontal: 20, marginTop: 10 }}>
+            <Button
+              title={loading ? <ActivityIndicator color={colors.text} /> : "Sign Out"}
+              onPress={handleSignOut}
+              variant="destructive"
+              size="large"
+              disabled={loading}
+            />
+          </View>
         </View>
 
         {/* Version */}
@@ -522,6 +743,18 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
     marginBottom: 16,
+  },
+  cameraIconContainer: {
+    position: 'absolute',
+    bottom: 12,
+    right: 0,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
   },
   profileName: {
     fontWeight: "700",
@@ -632,6 +865,16 @@ const styles = StyleSheet.create({
   timeButtonText: {
     color: "#FFFFFF",
     fontSize: 14,
+    fontWeight: "600",
+  },
+  testButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    borderWidth: 1,
+  },
+  testButtonText: {
+    fontSize: 12,
     fontWeight: "600",
   },
   version: {

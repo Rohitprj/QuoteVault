@@ -1,20 +1,79 @@
-import React from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../contexts/ThemeContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAuth } from "../contexts/AuthContext"; // Import useAuth
+import * as ImagePicker from 'expo-image-picker'; // Import ImagePicker
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
+
+const PROFILE_IMAGE_KEY = 'user_profile_image'; // Key for AsyncStorage
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { colors, textSize, isDark } = useTheme();
   const insets = useSafeAreaInsets();
+  const { user } = useAuth(); // Destructure user from useAuth
+  const [profileImageUri, setProfileImageUri] = useState<string | null>(null); // State for profile image
 
   const titleFontSize =
     textSize === "small" ? 20 : textSize === "large" ? 28 : 24;
   const labelFontSize =
     textSize === "small" ? 14 : textSize === "large" ? 20 : 16;
+
+  // Load profile image from AsyncStorage on mount
+  useEffect(() => {
+    const loadProfileImage = async () => {
+      try {
+        const storedUri = await AsyncStorage.getItem(PROFILE_IMAGE_KEY);
+        if (storedUri) {
+          setProfileImageUri(storedUri);
+        }
+      } catch (e) {
+        console.error("Failed to load profile image:", e);
+      }
+    };
+    loadProfileImage();
+  }, []);
+
+  // Save profile image to AsyncStorage whenever it changes
+  useEffect(() => {
+    const saveProfileImage = async () => {
+      try {
+        if (profileImageUri) {
+          await AsyncStorage.setItem(PROFILE_IMAGE_KEY, profileImageUri);
+        } else {
+          // If profileImageUri becomes null, remove it from AsyncStorage
+          await AsyncStorage.removeItem(PROFILE_IMAGE_KEY);
+        }
+      } catch (e) {
+        console.error("Failed to save profile image:", e);
+      }
+    };
+    saveProfileImage();
+  }, [profileImageUri]);
+
+  const pickImage = async () => {
+    // Request permission to access media library
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Required', 'Please grant media library access to select a profile image.');
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setProfileImageUri(result.assets[0].uri);
+    }
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -51,12 +110,17 @@ export default function ProfileScreen() {
 
         {/* Profile Section */}
         <View style={styles.profileSection}>
-          <Image
-            source={{
-              uri: "https://i.pravatar.cc/150?img=33",
-            }}
-            style={styles.profileAvatar}
-          />
+          <TouchableOpacity onPress={pickImage}>
+            <Image
+              source={{
+                uri: profileImageUri || "https://i.pravatar.cc/150?img=33", // Default avatar
+              }}
+              style={styles.profileAvatar}
+            />
+            <View style={[styles.cameraIconContainer, { backgroundColor: colors.accent }]}>
+              <Ionicons name="camera" size={20} color="#FFFFFF" />
+            </View>
+          </TouchableOpacity>
           <Text
             style={[
               styles.profileName,
@@ -66,7 +130,7 @@ export default function ProfileScreen() {
               },
             ]}
           >
-            Marcus Aurelius
+            {user?.email ? user.email.split('@')[0] : "Guest User"}
           </Text>
           <Text
             style={[
@@ -77,7 +141,7 @@ export default function ProfileScreen() {
               },
             ]}
           >
-            marcus.app@stoic.com
+            {user?.email || "No email provided"}
           </Text>
         </View>
 
@@ -197,6 +261,18 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     marginBottom: 16,
+  },
+  cameraIconContainer: {
+    position: 'absolute',
+    bottom: 12,
+    right: 0,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
   },
   profileName: {
     fontWeight: "700",

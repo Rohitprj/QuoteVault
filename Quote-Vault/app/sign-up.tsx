@@ -8,6 +8,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   ImageBackground,
+  ActivityIndicator, // Import ActivityIndicator for loading state
+  Alert, // Import Alert for displaying messages
 } from "react-native";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -16,18 +18,36 @@ import { useTheme } from "../contexts/ThemeContext";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAuth } from "../contexts/AuthContext"; // Import useAuth
 
 export default function SignUpScreen() {
   const router = useRouter();
   const { colors, textSize, isDark } = useTheme();
   const insets = useSafeAreaInsets();
+  const { signUp } = useAuth(); // Destructure signUp from useAuth
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false); // State for loading indicator
+  const [error, setError] = useState<string | null>(null); // State for error messages
 
   const headingFontSize =
     textSize === "small" ? 28 : textSize === "large" ? 36 : 32;
   const subheadingFontSize =
     textSize === "small" ? 14 : textSize === "large" ? 18 : 16;
+
+  const handleSignUp = async () => {
+    setLoading(true);
+    setError(null);
+    const { error } = await signUp(email, password);
+    if (error) {
+      setError(error.message);
+      Alert.alert("Sign Up Error", error.message); // Display error message
+    } else {
+      Alert.alert("Sign Up Successful", "Please check your email to confirm your account.");
+    }
+    setLoading(false);
+  };
 
   return (
     <KeyboardAvoidingView
@@ -84,6 +104,7 @@ export default function SignUpScreen() {
           </View>
 
           <View style={styles.form}>
+            {error && <Text style={{ color: "red", marginBottom: 10 }}>{error}</Text>}
             <Input
               label="Email"
               placeholder="Enter your email"
@@ -91,6 +112,7 @@ export default function SignUpScreen() {
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
+              editable={!loading} // Disable input when loading
             />
 
             <Input
@@ -99,14 +121,16 @@ export default function SignUpScreen() {
               value={password}
               onChangeText={setPassword}
               secureTextEntry
+              editable={!loading} // Disable input when loading
             />
 
             <Button
-              title="Create Account"
-              onPress={() => router.push("/(tabs)/home")}
+              title={loading ? <ActivityIndicator color={colors.text} /> : "Create Account"}
+              onPress={handleSignUp}
               variant="primary"
               size="large"
               style={styles.createButton}
+              disabled={loading} // Disable button when loading
             />
 
             <View style={styles.divider}>
@@ -130,6 +154,7 @@ export default function SignUpScreen() {
                   { backgroundColor: colors.surface },
                 ]}
                 activeOpacity={0.7}
+                disabled={loading}
               >
                 <Ionicons name="logo-apple" size={24} color={colors.text} />
                 <Text style={[styles.socialButtonText, { color: colors.text }]}>
@@ -143,6 +168,7 @@ export default function SignUpScreen() {
                   { backgroundColor: colors.surface },
                 ]}
                 activeOpacity={0.7}
+                disabled={loading}
               >
                 <Ionicons name="logo-google" size={24} color={colors.text} />
                 <Text style={[styles.socialButtonText, { color: colors.text }]}>
@@ -157,7 +183,7 @@ export default function SignUpScreen() {
               >
                 Already have an account?{" "}
               </Text>
-              <TouchableOpacity onPress={() => router.push("/sign-in")}>
+              <TouchableOpacity onPress={() => router.push("/sign-in")} disabled={loading}>
                 <Text style={[styles.footerLink, { color: colors.accent }]}>
                   Sign In
                 </Text>

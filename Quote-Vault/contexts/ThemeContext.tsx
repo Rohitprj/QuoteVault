@@ -7,6 +7,8 @@ import React, {
 } from "react";
 import { useColorScheme } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuth } from "./AuthContext";
+import { syncSettingsOnLogin, updateUserSettings } from "../services/profileService";
 
 export type ThemeMode = "light" | "dark" | "auto";
 export type AccentColor = "blue" | "purple" | "teal" | "red" | "orange";
@@ -73,13 +75,22 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const systemColorScheme = useColorScheme();
+  const { user } = useAuth();
   const [theme, setThemeState] = useState<ThemeMode>("dark");
   const [accentColor, setAccentColorState] = useState<AccentColor>("blue");
   const [textSize, setTextSizeState] = useState<TextSize>("medium");
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     loadSettings();
   }, []);
+
+  // Sync settings when user logs in
+  useEffect(() => {
+    if (user && isInitialized) {
+      syncUserSettings();
+    }
+  }, [user, isInitialized]);
 
   const loadSettings = async () => {
     try {
@@ -90,8 +101,49 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
       if (savedTheme) setThemeState(savedTheme as ThemeMode);
       if (savedAccent) setAccentColorState(savedAccent as AccentColor);
       if (savedTextSize) setTextSizeState(savedTextSize as TextSize);
+
+      setIsInitialized(true);
     } catch (error) {
       console.error("Error loading settings:", error);
+      setIsInitialized(true);
+    }
+  };
+
+  const syncUserSettings = async () => {
+    if (!user) return;
+
+    try {
+      const localSettings = {
+        theme: theme === 'auto' ? 'light' : theme, // Convert auto to actual value for server
+        accentColor: accentColorMap[accentColor].primary,
+        fontSize: textSize,
+      };
+
+      const serverSettings = await syncSettingsOnLogin(user.id, localSettings);
+
+      // Update local state with server settings if they differ
+      if (serverSettings.theme !== (theme === 'auto' ? 'light' : theme)) {
+        const serverTheme = serverSettings.theme as ThemeMode;
+        setThemeState(serverTheme);
+        await AsyncStorage.setItem("theme", serverTheme);
+      }
+
+      // Find accent color name from hex value
+      const accentColorName = Object.keys(accentColorMap).find(
+        key => accentColorMap[key as AccentColor].primary === serverSettings.accentColor
+      ) as AccentColor;
+
+      if (accentColorName && accentColorName !== accentColor) {
+        setAccentColorState(accentColorName);
+        await AsyncStorage.setItem("accentColor", accentColorName);
+      }
+
+      if (serverSettings.fontSize !== textSize) {
+        setTextSizeState(serverSettings.fontSize);
+        await AsyncStorage.setItem("textSize", serverSettings.fontSize);
+      }
+    } catch (error) {
+      console.error("Error syncing user settings:", error);
     }
   };
 
@@ -99,6 +151,13 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
     setThemeState(newTheme);
     try {
       await AsyncStorage.setItem("theme", newTheme);
+
+      // Sync with server if user is logged in
+      if (user) {
+        await updateUserSettings(user.id, {
+          theme: newTheme === 'auto' ? 'light' : newTheme
+        });
+      }
     } catch (error) {
       console.error("Error saving theme:", error);
     }
@@ -108,6 +167,13 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
     setAccentColorState(color);
     try {
       await AsyncStorage.setItem("accentColor", color);
+
+      // Sync with server if user is logged in
+      if (user) {
+        await updateUserSettings(user.id, {
+          accentColor: accentColorMap[color].primary
+        });
+      }
     } catch (error) {
       console.error("Error saving accent color:", error);
     }
@@ -117,6 +183,13 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
     setTextSizeState(size);
     try {
       await AsyncStorage.setItem("textSize", size);
+
+      // Sync with server if user is logged in
+      if (user) {
+        await updateUserSettings(user.id, {
+          fontSize: size
+        });
+      }
     } catch (error) {
       console.error("Error saving text size:", error);
     }

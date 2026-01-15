@@ -28,12 +28,12 @@ import {
   searchQuotes,
   getQuoteOfTheDay,
   getCategories,
-  type Quote
+  type Quote,
 } from "../../services/quoteService";
 import {
   toggleFavorite,
   checkFavoriteStatus,
-  getFavoriteQuoteIds
+  getFavoriteQuoteIds,
 } from "../../services/favoritesService";
 
 export default function HomeScreen() {
@@ -45,12 +45,18 @@ export default function HomeScreen() {
   // State management
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [availableCategories, setAvailableCategories] = useState<string[]>(["All"]);
+  const [availableCategories, setAvailableCategories] = useState<string[]>([
+    "All",
+  ]);
 
   // Quotes data
   const [quotes, setQuotes] = useState<Quote[]>([]);
-  const [quoteOfTheDayData, setQuoteOfTheDayData] = useState<Quote | null>(null);
-  const [favoritedQuoteIds, setFavoritedQuoteIds] = useState<Set<number>>(new Set());
+  const [quoteOfTheDayData, setQuoteOfTheDayData] = useState<Quote | null>(
+    null
+  );
+  const [favoritedQuoteIds, setFavoritedQuoteIds] = useState<Set<number>>(
+    new Set()
+  );
 
   // Loading states
   const [isLoading, setIsLoading] = useState(false);
@@ -88,85 +94,103 @@ export default function HomeScreen() {
       // Load initial quotes
       await loadQuotes(true);
     } catch (error) {
-      console.error('Error loading initial data:', error);
-      Alert.alert('Error', 'Failed to load data. Please try again.');
+      console.error("Error loading initial data:", error);
+      Alert.alert("Error", "Failed to load data. Please try again.");
     } finally {
       setIsLoading(false);
     }
   }, [user]);
 
   // Load quotes function
-  const loadQuotes = useCallback(async (refresh = false) => {
-    try {
-      if (refresh) {
-        setIsRefreshing(true);
-        setCurrentPage(0);
-        setHasMore(true);
-      } else {
-        setIsLoadingMore(true);
+  const loadQuotes = useCallback(
+    async (refresh = false) => {
+      try {
+        if (refresh) {
+          setIsRefreshing(true);
+          setCurrentPage(0);
+          setHasMore(true);
+        } else {
+          setIsLoadingMore(true);
+        }
+
+        const page = refresh ? 0 : currentPage;
+        let result;
+
+        if (searchQuery.trim()) {
+          result = await searchQuotes(
+            searchQuery.trim(),
+            page * QUOTES_PER_PAGE,
+            QUOTES_PER_PAGE
+          );
+        } else if (selectedCategory !== "All") {
+          result = await fetchQuotesByCategory(
+            selectedCategory,
+            page * QUOTES_PER_PAGE,
+            QUOTES_PER_PAGE
+          );
+        } else {
+          result = await fetchQuotes(page * QUOTES_PER_PAGE, QUOTES_PER_PAGE);
+        }
+
+        if (result.error) {
+          console.error("Error loading quotes:", result.error);
+          Alert.alert("Error", "Failed to load quotes. Please try again.");
+          return;
+        }
+
+        if (refresh) {
+          setQuotes(result.data || []);
+        } else {
+          setQuotes((prev) => [...prev, ...(result.data || [])]);
+        }
+
+        setHasMore(result.hasMore);
+        if (!refresh) {
+          setCurrentPage((prev) => prev + 1);
+        }
+      } catch (error) {
+        console.error("Error in loadQuotes:", error);
+        Alert.alert("Error", "Failed to load quotes. Please try again.");
+      } finally {
+        setIsRefreshing(false);
+        setIsLoadingMore(false);
       }
+    },
+    [currentPage, searchQuery, selectedCategory]
+  );
 
-      const page = refresh ? 0 : currentPage;
-      let result;
-
-      if (searchQuery.trim()) {
-        result = await searchQuotes(searchQuery.trim(), page * QUOTES_PER_PAGE, QUOTES_PER_PAGE);
-      } else if (selectedCategory !== "All") {
-        result = await fetchQuotesByCategory(selectedCategory, page * QUOTES_PER_PAGE, QUOTES_PER_PAGE);
-      } else {
-        result = await fetchQuotes(page * QUOTES_PER_PAGE, QUOTES_PER_PAGE);
-      }
-
-      if (result.error) {
-        console.error('Error loading quotes:', result.error);
-        Alert.alert('Error', 'Failed to load quotes. Please try again.');
+  // Handle favorite toggle
+  const handleToggleFavorite = useCallback(
+    async (quoteId: number) => {
+      if (!user) {
+        Alert.alert("Sign In Required", "Please sign in to save favorites.");
         return;
       }
 
-      if (refresh) {
-        setQuotes(result.data || []);
+      const isCurrentlyFavorited = favoritedQuoteIds.has(quoteId);
+      const { success, error } = await toggleFavorite(
+        user.id,
+        quoteId,
+        isCurrentlyFavorited
+      );
+
+      if (success) {
+        setFavoritedQuoteIds((prev) => {
+          const newSet = new Set(prev);
+          if (isCurrentlyFavorited) {
+            newSet.delete(quoteId);
+          } else {
+            newSet.add(quoteId);
+          }
+          return newSet;
+        });
       } else {
-        setQuotes(prev => [...prev, ...(result.data || [])]);
+        Alert.alert("Error", "Failed to update favorite. Please try again.");
+        console.error("Error toggling favorite:", error);
       }
-
-      setHasMore(result.hasMore);
-      if (!refresh) {
-        setCurrentPage(prev => prev + 1);
-      }
-    } catch (error) {
-      console.error('Error in loadQuotes:', error);
-      Alert.alert('Error', 'Failed to load quotes. Please try again.');
-    } finally {
-      setIsRefreshing(false);
-      setIsLoadingMore(false);
-    }
-  }, [currentPage, searchQuery, selectedCategory]);
-
-  // Handle favorite toggle
-  const handleToggleFavorite = useCallback(async (quoteId: number) => {
-    if (!user) {
-      Alert.alert('Sign In Required', 'Please sign in to save favorites.');
-      return;
-    }
-
-    const isCurrentlyFavorited = favoritedQuoteIds.has(quoteId);
-    const { success, error } = await toggleFavorite(user.id, quoteId, isCurrentlyFavorited);
-
-    if (success) {
-      setFavoritedQuoteIds(prev => {
-        const newSet = new Set(prev);
-        if (isCurrentlyFavorited) {
-          newSet.delete(quoteId);
-        } else {
-          newSet.add(quoteId);
-        }
-        return newSet;
-      });
-    } else {
-      Alert.alert('Error', 'Failed to update favorite. Please try again.');
-      console.error('Error toggling favorite:', error);
-    }
-  }, [user, favoritedQuoteIds]);
+    },
+    [user, favoritedQuoteIds]
+  );
 
   // Handle category change
   const handleCategoryChange = useCallback((category: string) => {
@@ -229,12 +253,12 @@ export default function HomeScreen() {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Image
+            {/* <Image
               source={{
                 uri: "https://i.pravatar.cc/150?img=12",
               }}
               style={styles.avatar}
-            />
+            /> */}
             <View>
               <Text
                 style={[
@@ -256,7 +280,7 @@ export default function HomeScreen() {
                   },
                 ]}
               >
-                Alex Harrison
+                {user?.email ? user.email.split("@")[0] : "Guest User"}
               </Text>
             </View>
           </View>
@@ -385,7 +409,11 @@ export default function HomeScreen() {
                 },
               ]}
             >
-              {searchQuery ? `Search Results for "${searchQuery}"` : selectedCategory === "All" ? "For You" : selectedCategory}
+              {searchQuery
+                ? `Search Results for "${searchQuery}"`
+                : selectedCategory === "All"
+                ? "For You"
+                : selectedCategory}
             </Text>
             {!searchQuery && (
               <TouchableOpacity style={styles.filterButton}>
@@ -439,12 +467,16 @@ export default function HomeScreen() {
             ListFooterComponent={
               isLoadingMore ? (
                 <View style={styles.loadingMore}>
-                  <Text style={{ color: colors.textSecondary }}>Loading more quotes...</Text>
+                  <Text style={{ color: colors.textSecondary }}>
+                    Loading more quotes...
+                  </Text>
                 </View>
               ) : hasMore ? null : (
                 <View style={styles.endOfList}>
                   <Text style={{ color: colors.textSecondary }}>
-                    {quotes.length === 0 ? "No quotes found" : "You've reached the end"}
+                    {quotes.length === 0
+                      ? "No quotes found"
+                      : "You've reached the end"}
                   </Text>
                 </View>
               )

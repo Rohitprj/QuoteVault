@@ -1,18 +1,66 @@
-import { DarkTheme, DefaultTheme } from "@react-navigation/native";
-import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import "react-native-reanimated";
+// import { DarkTheme, DefaultTheme } from "@react-navigation/native";
+// import { Stack } from "expo-router";
+// import { StatusBar } from "expo-status-bar";
+// import "react-native-reanimated";
 
-import { useColorScheme } from "@/hooks/use-color-scheme";
+// import { useColorScheme } from "@/hooks/use-color-scheme";
+// import { SafeAreaProvider } from "react-native-safe-area-context";
+// import { ThemeProvider } from "@/contexts/ThemeContext";
+
+// // export const unstable_settings = {
+// //   anchor: "(tabs)",
+// // };
+
+// export default function RootLayout() {
+//   const colorScheme = useColorScheme();
+
+//   return (
+//     <SafeAreaProvider>
+//       <ThemeProvider>
+//         <Stack
+//           screenOptions={{
+//             headerShown: false,
+//             contentStyle: { backgroundColor: "transparent" },
+//           }}
+//         >
+//           <Stack.Screen name="index" options={{ headerShown: false }} />
+//         </Stack>
+//         <StatusBar style="auto" />
+//       </ThemeProvider>
+//     </SafeAreaProvider>
+//   );
+// }
+
+import { SplashScreen, Stack, useRouter } from "expo-router";
+import { ThemeProvider } from "../contexts/ThemeContext";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { ThemeProvider } from "@/contexts/ThemeContext";
+import { AuthProvider, useAuth } from "../contexts/AuthContext";
+import React, { useEffect } from "react";
 
-// export const unstable_settings = {
-//   anchor: "(tabs)",
-// };
+// Prevent the splash screen from auto-hiding before asset loading is complete.
+SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
+function RootLayoutNav() {
+  const { session, isLoading } = useAuth();
+  console.log("Session", JSON.stringify(session, null, 2));
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (session) {
+        // User is signed in
+        router.replace("/(tabs)/home");
+      } else {
+        // User is not signed in
+        router.replace("/sign-in");
+      }
+      SplashScreen.hideAsync();
+    }
+  }, [session, isLoading]);
+
+  if (isLoading) {
+    return null; // Or a loading spinner
+  }
 
   return (
     <SafeAreaProvider>
@@ -23,10 +71,28 @@ export default function RootLayout() {
             contentStyle: { backgroundColor: "transparent" },
           }}
         >
-          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="sign-in" options={{ headerShown: false }} />
+          <Stack.Screen name="sign-up" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="profile" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="customize-quote"
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="reset-password"
+            options={{ headerShown: false }}
+          />
         </Stack>
-        <StatusBar style="auto" />
       </ThemeProvider>
     </SafeAreaProvider>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <AuthProvider>
+      <RootLayoutNav />
+    </AuthProvider>
   );
 }

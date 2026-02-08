@@ -1,41 +1,10 @@
-// import { DarkTheme, DefaultTheme } from "@react-navigation/native";
-// import { Stack } from "expo-router";
-// import { StatusBar } from "expo-status-bar";
-// import "react-native-reanimated";
-
-// import { useColorScheme } from "@/hooks/use-color-scheme";
-// import { SafeAreaProvider } from "react-native-safe-area-context";
-// import { ThemeProvider } from "@/contexts/ThemeContext";
-
-// // export const unstable_settings = {
-// //   anchor: "(tabs)",
-// // };
-
-// export default function RootLayout() {
-//   const colorScheme = useColorScheme();
-
-//   return (
-//     <SafeAreaProvider>
-//       <ThemeProvider>
-//         <Stack
-//           screenOptions={{
-//             headerShown: false,
-//             contentStyle: { backgroundColor: "transparent" },
-//           }}
-//         >
-//           <Stack.Screen name="index" options={{ headerShown: false }} />
-//         </Stack>
-//         <StatusBar style="auto" />
-//       </ThemeProvider>
-//     </SafeAreaProvider>
-//   );
-// }
-
 import { SplashScreen, Stack, useRouter } from "expo-router";
 import { ThemeProvider } from "../contexts/ThemeContext";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider, useAuth } from "../contexts/AuthContext";
 import React, { useEffect } from "react";
+import "react-native-reanimated";
+import { StatusBar } from "expo-status-bar";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -84,6 +53,7 @@ function RootLayoutNav() {
             options={{ headerShown: false }}
           />
         </Stack>
+        <StatusBar style="auto" />
       </ThemeProvider>
     </SafeAreaProvider>
   );

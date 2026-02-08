@@ -55,7 +55,7 @@ export default function SignUpScreen() {
   return (
     <KeyboardAvoidingView
       style={[styles.container, { backgroundColor: colors.background }]}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      // behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <StatusBar style={isDark ? "light" : "dark"} />
       <ImageBackground
@@ -63,7 +63,6 @@ export default function SignUpScreen() {
           uri: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4",
         }}
         style={styles.backgroundImage}
-        blurRadius={10}
       >
         <View
           style={[
@@ -156,36 +155,6 @@ export default function SignUpScreen() {
               <View
                 style={[styles.dividerLine, { backgroundColor: colors.border }]}
               />
-            </View>
-
-            <View style={styles.socialButtons}>
-              <TouchableOpacity
-                style={[
-                  styles.socialButton,
-                  { backgroundColor: colors.surface },
-                ]}
-                activeOpacity={0.7}
-                disabled={loading}
-              >
-                <Ionicons name="logo-apple" size={24} color={colors.text} />
-                <Text style={[styles.socialButtonText, { color: colors.text }]}>
-                  Apple
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.socialButton,
-                  { backgroundColor: colors.surface },
-                ]}
-                activeOpacity={0.7}
-                disabled={loading}
-              >
-                <Ionicons name="logo-google" size={24} color={colors.text} />
-                <Text style={[styles.socialButtonText, { color: colors.text }]}>
-                  Google
-                </Text>
-              </TouchableOpacity>
             </View>
 
             <View style={styles.footer}>

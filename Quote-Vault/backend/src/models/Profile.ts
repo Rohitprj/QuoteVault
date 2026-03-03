@@ -1,12 +1,13 @@
-const mongoose = require("mongoose");
+import mongoose, { Schema } from "mongoose";
+import type { IProfile } from "../types/index.js";
 
-const profileSchema = new mongoose.Schema(
+const profileSchema = new Schema<IProfile>(
   {
     user: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      unique: true, // One profile per user
+      unique: true,
     },
     displayName: {
       type: String,
@@ -54,4 +55,5 @@ const profileSchema = new mongoose.Schema(
   },
 );
 
-module.exports = mongoose.model("Profile", profileSchema);
+const Profile = mongoose.model<IProfile>("Profile", profileSchema);
+export default Profile;

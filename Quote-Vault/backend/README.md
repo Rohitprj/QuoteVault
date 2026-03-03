@@ -1,6 +1,6 @@
-# QuoteVault Backend - Node.js / Express / MongoDB
+# QuoteVault Backend - TypeScript / Express / MongoDB
 
-A complete REST API backend that replicates the Supabase-powered QuoteVault functionality using Node.js, Express, and MongoDB.
+A fully typed REST API backend (ESM + TypeScript) that replicates the Supabase-powered QuoteVault functionality using Node.js, Express, and MongoDB.
 
 ## Schema Mapping (Supabase → MongoDB)
 
@@ -40,10 +40,11 @@ npm run seed
 
 ### 5. Start the server
 ```bash
-# Development (auto-restart on changes)
+# Development (auto-restart on changes via tsx)
 npm run dev
 
-# Production
+# Production (build first, then run)
+npm run build
 npm start
 ```
 
@@ -137,26 +138,30 @@ curl -X POST http://localhost:5000/api/favorites/toggle \
 ## Project Structure
 ```
 backend/
-├── config/
-│   └── db.js              # MongoDB connection
-├── middleware/
-│   └── auth.js            # JWT auth middleware
-├── models/
-│   ├── User.js            # User model (replaces auth.users)
-│   ├── Quote.js           # Quote model
-│   ├── Favorite.js        # Favorites model (user_favorites)
-│   ├── Collection.js      # Collection model (collections + collection_quotes)
-│   └── Profile.js         # Profile model (profiles)
-├── routes/
-│   ├── auth.js            # Auth endpoints
-│   ├── quotes.js          # Quote endpoints
-│   ├── favorites.js       # Favorites endpoints
-│   ├── collections.js     # Collection endpoints
-│   └── profile.js         # Profile endpoints
-├── seed/
-│   └── seed.js            # Database seeder (105 quotes)
-├── .env.example           # Environment template
-├── package.json
-├── server.js              # App entry point
+├── src/
+│   ├── config/
+│   │   └── db.ts              # MongoDB connection
+│   ├── middleware/
+│   │   └── auth.ts            # JWT auth middleware
+│   ├── models/
+│   │   ├── User.ts            # User model (replaces auth.users)
+│   │   ├── Quote.ts           # Quote model
+│   │   ├── Favorite.ts        # Favorites model (user_favorites)
+│   │   ├── Collection.ts      # Collection model (collections + collection_quotes)
+│   │   └── Profile.ts         # Profile model (profiles)
+│   ├── routes/
+│   │   ├── auth.ts            # Auth endpoints
+│   │   ├── quotes.ts          # Quote endpoints
+│   │   ├── favorites.ts       # Favorites endpoints
+│   │   ├── collections.ts     # Collection endpoints
+│   │   └── profile.ts         # Profile endpoints
+│   ├── seed/
+│   │   └── seed.ts            # Database seeder (105 quotes)
+│   ├── types/
+│   │   └── index.ts           # Shared TypeScript interfaces
+│   └── server.ts              # App entry point
+├── .env.example               # Environment template
+├── package.json               # "type": "module" + TS deps
+├── tsconfig.json              # TypeScript config (NodeNext)
 └── README.md
 ```

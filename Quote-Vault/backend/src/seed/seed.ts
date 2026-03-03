@@ -1,10 +1,16 @@
-require("dotenv").config();
-const mongoose = require("mongoose");
-const Quote = require("../models/Quote");
-const connectDB = require("../config/db");
+import "dotenv/config";
+import Quote from "../models/Quote.js";
+import connectDB from "../config/db.js";
+import type { QuoteCategory } from "../types/index.js";
 
-const seedQuotes = [
-  // Motivation (25 quotes)
+interface SeedQuote {
+  text: string;
+  author: string;
+  category: QuoteCategory;
+}
+
+const seedQuotes: SeedQuote[] = [
+  // ── Motivation (25 quotes) ──────────────────────────────────────────────
   {
     text: "The only way to do great work is to love what you do.",
     author: "Steve Jobs",
@@ -131,7 +137,7 @@ const seedQuotes = [
     category: "Motivation",
   },
 
-  // Love (20 quotes)
+  // ── Love (20 quotes) ───────────────────────────────────────────────────
   {
     text: "Love is not just looking at each other, it's looking in the same direction.",
     author: "Antoine de Saint-Exupéry",
@@ -233,7 +239,7 @@ const seedQuotes = [
     category: "Love",
   },
 
-  // Success (20 quotes)
+  // ── Success (20 quotes) ────────────────────────────────────────────────
   {
     text: "Success is not final, failure is not fatal: it is the courage to continue that counts.",
     author: "Winston Churchill",
@@ -335,7 +341,7 @@ const seedQuotes = [
     category: "Success",
   },
 
-  // Wisdom (20 quotes)
+  // ── Wisdom (20 quotes) ─────────────────────────────────────────────────
   {
     text: "The only true wisdom is in knowing you know nothing.",
     author: "Socrates",
@@ -433,7 +439,7 @@ const seedQuotes = [
     category: "Wisdom",
   },
 
-  // Humor (20 quotes)
+  // ── Humor (20 quotes) ──────────────────────────────────────────────────
   {
     text: "I told my wife she was drawing her eyebrows too high. She looked surprised.",
     author: "Anonymous",
@@ -536,7 +542,7 @@ const seedQuotes = [
   },
 ];
 
-const seedDatabase = async () => {
+const seedDatabase = async (): Promise<void> => {
   try {
     await connectDB();
 
@@ -549,15 +555,15 @@ const seedDatabase = async () => {
     console.log(`Successfully seeded ${inserted.length} quotes`);
 
     // Print summary
-    const categories = await Quote.aggregate([
+    const categories = await Quote.aggregate<{ _id: string; count: number }>([
       { $group: { _id: "$category", count: { $sum: 1 } } },
       { $sort: { _id: 1 } },
     ]);
 
     console.log("\nQuotes by category:");
-    categories.forEach((cat) => {
+    for (const cat of categories) {
       console.log(`  ${cat._id}: ${cat.count}`);
-    });
+    }
 
     process.exit(0);
   } catch (error) {

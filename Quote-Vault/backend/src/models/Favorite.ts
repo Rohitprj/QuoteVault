@@ -1,14 +1,15 @@
-const mongoose = require("mongoose");
+import mongoose, { Schema } from "mongoose";
+import type { IFavorite } from "../types/index.js";
 
-const favoriteSchema = new mongoose.Schema(
+const favoriteSchema = new Schema<IFavorite>(
   {
     user: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
     quote: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Quote",
       required: true,
     },
@@ -20,7 +21,7 @@ const favoriteSchema = new mongoose.Schema(
 
 // Ensure a user can only favorite a quote once (mirrors UNIQUE(user_id, quote_id))
 favoriteSchema.index({ user: 1, quote: 1 }, { unique: true });
-// Index for efficient user-based queries
 favoriteSchema.index({ user: 1 });
 
-module.exports = mongoose.model("Favorite", favoriteSchema);
+const Favorite = mongoose.model<IFavorite>("Favorite", favoriteSchema);
+export default Favorite;

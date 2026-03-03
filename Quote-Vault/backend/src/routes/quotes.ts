@@ -1,19 +1,17 @@
-const express = require("express");
-const Quote = require("../models/Quote");
+import { Router, Request, Response } from "express";
+import Quote from "../models/Quote.js";
 
-const router = express.Router();
+const router = Router();
 
 // ─── GET /api/quotes ────────────────────────────────────────────────────────
-// Mirrors: fetchQuotes(from, limit, category)
-// Public route - no auth needed (mirrors RLS: "Quotes are viewable by everyone")
-router.get("/", async (req, res) => {
+router.get("/", async (req: Request, res: Response): Promise<void> => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
-    const category = req.query.category;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+    const category = req.query.category as string | undefined;
     const skip = (page - 1) * limit;
 
-    const filter = {};
+    const filter: Record<string, string> = {};
     if (category && category !== "All") {
       filter.category = category;
     }
@@ -40,19 +38,18 @@ router.get("/", async (req, res) => {
 });
 
 // ─── GET /api/quotes/search ─────────────────────────────────────────────────
-// Mirrors: searchQuotes(query)
-router.get("/search", async (req, res) => {
+router.get("/search", async (req: Request, res: Response): Promise<void> => {
   try {
-    const query = req.query.q;
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 50;
+    const query = req.query.q as string | undefined;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 50;
     const skip = (page - 1) * limit;
 
     if (!query) {
-      return res.status(400).json({ error: "Search query is required" });
+      res.status(400).json({ error: "Search query is required" });
+      return;
     }
 
-    // Case-insensitive regex search (mirrors ilike in Supabase)
     const searchRegex = new RegExp(query, "i");
     const filter = {
       $or: [{ text: searchRegex }, { author: searchRegex }],
@@ -74,15 +71,14 @@ router.get("/search", async (req, res) => {
 });
 
 // ─── GET /api/quotes/today ──────────────────────────────────────────────────
-// Mirrors: getQuoteOfTheDay()
-router.get("/today", async (req, res) => {
+router.get("/today", async (_req: Request, res: Response): Promise<void> => {
   try {
     const count = await Quote.countDocuments();
     if (count === 0) {
-      return res.status(404).json({ error: "No quotes available" });
+      res.status(404).json({ error: "No quotes available" });
+      return;
     }
 
-    // Deterministic selection based on date (same logic as Supabase version)
     const dayIndex = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
     const quoteIndex = dayIndex % count;
 
@@ -96,25 +92,27 @@ router.get("/today", async (req, res) => {
 });
 
 // ─── GET /api/quotes/categories ─────────────────────────────────────────────
-// Mirrors: getCategories()
-router.get("/categories", async (req, res) => {
-  try {
-    const categories = await Quote.distinct("category");
-    categories.sort();
-    res.json({ data: categories });
-  } catch (error) {
-    console.error("Error fetching categories:", error);
-    res.status(500).json({ error: "Error fetching categories" });
-  }
-});
+router.get(
+  "/categories",
+  async (_req: Request, res: Response): Promise<void> => {
+    try {
+      const categories: string[] = await Quote.distinct("category");
+      categories.sort();
+      res.json({ data: categories });
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      res.status(500).json({ error: "Error fetching categories" });
+    }
+  },
+);
 
 // ─── GET /api/quotes/:id ────────────────────────────────────────────────────
-// Mirrors: getQuoteById(id)
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req: Request, res: Response): Promise<void> => {
   try {
     const quote = await Quote.findById(req.params.id);
     if (!quote) {
-      return res.status(404).json({ error: "Quote not found" });
+      res.status(404).json({ error: "Quote not found" });
+      return;
     }
     res.json({ data: quote });
   } catch (error) {
@@ -123,4 +121,4 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

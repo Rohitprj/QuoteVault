@@ -1,6 +1,7 @@
-const mongoose = require("mongoose");
+import mongoose, { Schema } from "mongoose";
+import type { IQuote } from "../types/index.js";
 
-const quoteSchema = new mongoose.Schema(
+const quoteSchema = new Schema<IQuote>(
   {
     text: {
       type: String,
@@ -23,6 +24,7 @@ const quoteSchema = new mongoose.Schema(
 
 // Indexes for better performance (mirrors SQL schema)
 quoteSchema.index({ category: 1 });
-quoteSchema.index({ text: "text", author: "text" }); // Text index for search
+quoteSchema.index({ text: "text", author: "text" });
 
-module.exports = mongoose.model("Quote", quoteSchema);
+const Quote = mongoose.model<IQuote>("Quote", quoteSchema);
+export default Quote;

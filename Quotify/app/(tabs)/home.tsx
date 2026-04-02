@@ -264,7 +264,7 @@ export default function HomeScreen() {
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={{
-          paddingBottom: 100,
+          paddingBottom: 50,
           // paddingTop: insets.top,
         }}
         showsVerticalScrollIndicator={false}
@@ -284,7 +284,7 @@ export default function HomeScreen() {
               >
                 GOOD MORNING
               </Text>
-              <Text
+              {/* <Text
                 style={[
                   styles.name,
                   {
@@ -294,7 +294,7 @@ export default function HomeScreen() {
                 ]}
               >
                 {user?.email ? user.email.split("@")[0] : "Guest User"}
-              </Text>
+              </Text> */}
             </View>
           </View>
           <TouchableOpacity>
@@ -525,8 +525,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 20,
+    paddingTop: 8,
+    paddingBottom: 8,
   },
   headerLeft: {
     flexDirection: "row",

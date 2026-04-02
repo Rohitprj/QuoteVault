@@ -51,6 +51,10 @@ export default function HomeScreen() {
 
   // Quotes data
   const [quotes, setQuotes] = useState<Quote[]>([]);
+  console.log(
+    "IDS:",
+    quotes.map((q) => q.id),
+  );
   const [quoteOfTheDayData, setQuoteOfTheDayData] = useState<Quote | null>(
     null,
   );
@@ -138,10 +142,25 @@ export default function HomeScreen() {
           return;
         }
 
+        // if (refresh) {
+        //   setQuotes(result.data || []);
+        // } else {
+        //   setQuotes((prev) => [...prev, ...(result.data || [])]);
+        // }
+
         if (refresh) {
           setQuotes(result.data || []);
         } else {
-          setQuotes((prev) => [...prev, ...(result.data || [])]);
+          setQuotes((prev) => {
+            const newData = [...prev, ...(result.data || [])];
+
+            // remove duplicates by id
+            const unique = Array.from(
+              new Map(newData.map((item) => [item.id, item])).values(),
+            );
+
+            return unique;
+          });
         }
 
         setHasMore(result.hasMore);
@@ -253,12 +272,6 @@ export default function HomeScreen() {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            {/* <Image
-              source={{
-                uri: "https://i.pravatar.cc/150?img=12",
-              }}
-              style={styles.avatar}
-            /> */}
             <View>
               <Text
                 style={[
@@ -444,7 +457,8 @@ export default function HomeScreen() {
 
           <FlatList
             data={quotes}
-            keyExtractor={(item) => item.id.toString()}
+            // keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item, index) => `${item.id}-${index}`}
             renderItem={({ item }) => (
               <QuoteCard
                 quote={item.text}
@@ -482,6 +496,7 @@ export default function HomeScreen() {
               )
             }
             showsVerticalScrollIndicator={false}
+            scrollEnabled={false}
           />
         </View>
       </ScrollView>
@@ -536,7 +551,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 24,
     paddingHorizontal: 16,
-    paddingVertical: 12,
     borderRadius: 12,
     borderWidth: 1,
     gap: 12,

@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   templateOption: {
-    width: width * 0.4,
+    width: width,
     marginRight: 12,
     borderRadius: 12,
     padding: 8,

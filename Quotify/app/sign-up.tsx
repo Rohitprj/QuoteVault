@@ -96,7 +96,7 @@ export default function SignUpScreen() {
               style={[
                 styles.subheading,
                 {
-                  color: colors.textSecondary,
+                  color: colors.text,
                   fontSize: subheadingFontSize,
                 },
               ]}
@@ -218,13 +218,16 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 40,
+    justifyContent: "center",
   },
   heading: {
     fontWeight: "700",
     marginBottom: 8,
+    textAlign: "center",
   },
   subheading: {
     fontWeight: "400",
+    textAlign: "center",
   },
   form: {
     width: "100%",

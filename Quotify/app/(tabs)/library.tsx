@@ -3,13 +3,11 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   Image,
   Dimensions,
   Alert,
   FlatList,
-  RefreshControl,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
@@ -25,12 +23,12 @@ import {
   getCollectionWithQuotes,
   createCollection,
   type Collection,
-  type CollectionWithQuotes
+  type CollectionWithQuotes,
 } from "../../services/collectionsService";
 import {
   getUserFavorites,
   toggleFavorite,
-  type Quote
+  type Quote,
 } from "../../services/favoritesService";
 
 const { width } = Dimensions.get("window");
@@ -45,7 +43,9 @@ export default function LibraryScreen() {
   // State management
   const [collections, setCollections] = useState<Collection[]>([]);
   const [favoriteQuotes, setFavoriteQuotes] = useState<Quote[]>([]);
-  const [favoritedQuoteIds, setFavoritedQuoteIds] = useState<Set<number>>(new Set());
+  const [favoritedQuoteIds, setFavoritedQuoteIds] = useState<Set<number>>(
+    new Set(),
+  );
 
   // Loading states
   const [isLoading, setIsLoading] = useState(false);
@@ -58,141 +58,158 @@ export default function LibraryScreen() {
   const FAVORITES_PER_PAGE = 20;
 
   // Load collections and favorites
-  const loadData = useCallback(async (refresh = false) => {
-    if (!user) return;
+  const loadData = useCallback(
+    async (refresh = false) => {
+      if (!user) return;
 
-    try {
-      if (refresh) {
-        setIsRefreshing(true);
-      } else {
-        setIsLoading(true);
+      try {
+        if (refresh) {
+          setIsRefreshing(true);
+        } else {
+          setIsLoading(true);
+        }
+
+        // Load collections
+        const { data: collectionsData, error: collectionsError } =
+          await getUserCollections(user.id);
+        if (collectionsError) {
+          console.error("Error loading collections:", collectionsError);
+        } else {
+          setCollections(collectionsData || []);
+        }
+
+        // Load favorites
+        await loadFavorites(true);
+      } catch (error) {
+        console.error("Error loading data:", error);
+        Alert.alert("Error", "Failed to load data. Please try again.");
+      } finally {
+        setIsLoading(false);
+        setIsRefreshing(false);
       }
-
-      // Load collections
-      const { data: collectionsData, error: collectionsError } = await getUserCollections(user.id);
-      if (collectionsError) {
-        console.error('Error loading collections:', collectionsError);
-      } else {
-        setCollections(collectionsData || []);
-      }
-
-      // Load favorites
-      await loadFavorites(true);
-    } catch (error) {
-      console.error('Error loading data:', error);
-      Alert.alert('Error', 'Failed to load data. Please try again.');
-    } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
-    }
-  }, [user]);
+    },
+    [user],
+  );
 
   // Load favorites with pagination
-  const loadFavorites = useCallback(async (refresh = false) => {
-    if (!user) return;
+  const loadFavorites = useCallback(
+    async (refresh = false) => {
+      if (!user) return;
 
-    try {
-      if (refresh) {
-        setFavoritesPage(0);
-        setHasMore(true);
-      } else {
-        setIsLoadingMore(true);
+      try {
+        if (refresh) {
+          setFavoritesPage(0);
+          setHasMore(true);
+        } else {
+          setIsLoadingMore(true);
+        }
+
+        const page = refresh ? 0 : favoritesPage;
+        const {
+          data,
+          error,
+          hasMore: moreAvailable,
+        } = await getUserFavorites(
+          user.id,
+          page * FAVORITES_PER_PAGE,
+          FAVORITES_PER_PAGE,
+        );
+
+        if (error) {
+          console.error("Error loading favorites:", error);
+          Alert.alert("Error", "Failed to load favorites. Please try again.");
+          return;
+        }
+
+        if (refresh) {
+          setFavoriteQuotes(data || []);
+          setFavoritedQuoteIds(new Set((data || []).map((q) => q.id)));
+        } else {
+          setFavoriteQuotes((prev) => [...prev, ...(data || [])]);
+        }
+
+        setHasMore(moreAvailable);
+        if (!refresh) {
+          setFavoritesPage((prev) => prev + 1);
+        }
+      } catch (error) {
+        console.error("Error in loadFavorites:", error);
+        Alert.alert("Error", "Failed to load favorites. Please try again.");
+      } finally {
+        setIsLoadingMore(false);
       }
+    },
+    [user, favoritesPage],
+  );
 
-      const page = refresh ? 0 : favoritesPage;
-      const { data, error, hasMore: moreAvailable } = await getUserFavorites(
-        user.id,
-        page * FAVORITES_PER_PAGE,
-        FAVORITES_PER_PAGE
-      );
-
-      if (error) {
-        console.error('Error loading favorites:', error);
-        Alert.alert('Error', 'Failed to load favorites. Please try again.');
+  // Handle favorite toggle
+  const handleToggleFavorite = useCallback(
+    async (quoteId: number) => {
+      if (!user) {
+        Alert.alert("Sign In Required", "Please sign in to manage favorites.");
         return;
       }
 
-      if (refresh) {
-        setFavoriteQuotes(data || []);
-        setFavoritedQuoteIds(new Set((data || []).map(q => q.id)));
-      } else {
-        setFavoriteQuotes(prev => [...prev, ...(data || [])]);
-      }
+      const isCurrentlyFavorited = favoritedQuoteIds.has(quoteId);
+      const { success, error } = await toggleFavorite(
+        user.id,
+        quoteId,
+        isCurrentlyFavorited,
+      );
 
-      setHasMore(moreAvailable);
-      if (!refresh) {
-        setFavoritesPage(prev => prev + 1);
-      }
-    } catch (error) {
-      console.error('Error in loadFavorites:', error);
-      Alert.alert('Error', 'Failed to load favorites. Please try again.');
-    } finally {
-      setIsLoadingMore(false);
-    }
-  }, [user, favoritesPage]);
+      if (success) {
+        setFavoritedQuoteIds((prev) => {
+          const newSet = new Set(prev);
+          if (isCurrentlyFavorited) {
+            newSet.delete(quoteId);
+          } else {
+            newSet.add(quoteId);
+          }
+          return newSet;
+        });
 
-  // Handle favorite toggle
-  const handleToggleFavorite = useCallback(async (quoteId: number) => {
-    if (!user) {
-      Alert.alert('Sign In Required', 'Please sign in to manage favorites.');
-      return;
-    }
-
-    const isCurrentlyFavorited = favoritedQuoteIds.has(quoteId);
-    const { success, error } = await toggleFavorite(user.id, quoteId, isCurrentlyFavorited);
-
-    if (success) {
-      setFavoritedQuoteIds(prev => {
-        const newSet = new Set(prev);
+        // Update favorite quotes list
         if (isCurrentlyFavorited) {
-          newSet.delete(quoteId);
+          setFavoriteQuotes((prev) => prev.filter((q) => q.id !== quoteId));
         } else {
-          newSet.add(quoteId);
+          // For adding, we'd need to fetch the quote data - for now, just refresh
+          await loadFavorites(true);
         }
-        return newSet;
-      });
-
-      // Update favorite quotes list
-      if (isCurrentlyFavorited) {
-        setFavoriteQuotes(prev => prev.filter(q => q.id !== quoteId));
       } else {
-        // For adding, we'd need to fetch the quote data - for now, just refresh
-        await loadFavorites(true);
+        Alert.alert("Error", "Failed to update favorite. Please try again.");
+        console.error("Error toggling favorite:", error);
       }
-    } else {
-      Alert.alert('Error', 'Failed to update favorite. Please try again.');
-      console.error('Error toggling favorite:', error);
-    }
-  }, [user, favoritedQuoteIds, loadFavorites]);
+    },
+    [user, favoritedQuoteIds, loadFavorites],
+  );
 
   // Handle create new collection
   const handleCreateCollection = useCallback(async () => {
     if (!user) {
-      Alert.alert('Sign In Required', 'Please sign in to create collections.');
+      Alert.alert("Sign In Required", "Please sign in to create collections.");
       return;
     }
 
-    Alert.prompt(
-      'Create Collection',
-      'Enter a name for your new collection:',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Create',
-          onPress: async (title) => {
-            if (!title?.trim()) return;
+    Alert.prompt("Create Collection", "Enter a name for your new collection:", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Create",
+        onPress: async (title) => {
+          if (!title?.trim()) return;
 
-            const { data, error } = await createCollection(user.id, title.trim());
-            if (error) {
-              Alert.alert('Error', 'Failed to create collection. Please try again.');
-              console.error('Error creating collection:', error);
-            } else {
-              setCollections(prev => [data!, ...prev]);
-            }
+          const { data, error } = await createCollection(user.id, title.trim());
+          if (error) {
+            Alert.alert(
+              "Error",
+              "Failed to create collection. Please try again.",
+            );
+            console.error("Error creating collection:", error);
+          } else {
+            setCollections((prev) => [data!, ...prev]);
           }
-        }
-      ]
-    );
+        },
+      },
+    ]);
   }, [user]);
 
   // Handle pull to refresh
@@ -220,183 +237,282 @@ export default function LibraryScreen() {
       style={[styles.container, { backgroundColor: colors.background }]}
     >
       <StatusBar style={isDark ? "light" : "dark"} />
-      <ScrollView
+      <FlatList
         style={styles.scrollView}
         contentContainerStyle={{
           paddingBottom: 100,
-          // paddingTop: insets.top,
+          paddingHorizontal: 20,
         }}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header */}
-        <View style={styles.header}>
+        data={favoriteQuotes}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
           <View
             style={[
-              styles.avatarPlaceholder,
-              { backgroundColor: colors.accentLight },
-            ]}
-          />
-          <Text
-            style={[
-              styles.title,
+              styles.favoriteQuoteCard,
               {
-                color: colors.text,
-                fontSize: sectionTitleFontSize,
+                backgroundColor: colors.card,
+                borderColor: colors.border,
               },
             ]}
           >
-            Favorites
-          </Text>
-          <TouchableOpacity>
-            <Ionicons name="search-outline" size={24} color={colors.text} />
-          </TouchableOpacity>
-        </View>
-
-        {/* Your Collections */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
+            <View style={styles.favoriteQuoteHeader}>
+              <View
+                style={[
+                  styles.quoteIcon,
+                  {
+                    backgroundColor: colors.accent,
+                  },
+                ]}
+              >
+                <Ionicons name="chatbubbles" size={24} color="#FFFFFF" />
+              </View>
+              <TouchableOpacity onPress={() => handleToggleFavorite(item.id)}>
+                <Ionicons
+                  name="heart"
+                  size={24}
+                  color={
+                    favoritedQuoteIds.has(item.id)
+                      ? colors.accent
+                      : colors.textSecondary
+                  }
+                />
+              </TouchableOpacity>
+            </View>
             <Text
               style={[
-                styles.sectionTitle,
+                styles.favoriteQuoteText,
                 {
                   color: colors.text,
-                  fontSize: sectionTitleFontSize,
+                  fontSize:
+                    textSize === "small" ? 16 : textSize === "large" ? 22 : 18,
                 },
               ]}
             >
-              Your Collections
+              {item.text}
             </Text>
-            <TouchableOpacity>
-              <Text style={[styles.seeAll, { color: colors.accent }]}>
-                See all
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.collectionsGrid}>
-            {/* Add new collection card */}
-            <TouchableOpacity
-              style={[
-                styles.collectionCard,
-                styles.addCollectionCard,
-                {
-                  backgroundColor: colors.surface,
-                  borderColor: colors.border,
-                  width: collectionCardWidth,
-                },
-              ]}
-              onPress={handleCreateCollection}
-              activeOpacity={0.8}
-            >
-              <View style={styles.addCollectionContent}>
-                <Ionicons name="add" size={32} color={colors.accent} />
-                <Text
-                  style={[
-                    styles.addCollectionText,
-                    {
-                      color: colors.text,
-                      fontSize:
-                        textSize === "small"
-                          ? 14
-                          : textSize === "large"
+            <View style={styles.favoriteQuoteFooter}>
+              <Text
+                style={[
+                  styles.favoriteQuoteAuthor,
+                  {
+                    color: colors.accent,
+                    fontSize:
+                      textSize === "small"
+                        ? 14
+                        : textSize === "large"
                           ? 18
                           : 16,
+                  },
+                ]}
+              >
+                - {item.author || "Unknown"}
+              </Text>
+              <Text
+                style={[
+                  styles.favoriteQuoteDate,
+                  {
+                    color: colors.textSecondary,
+                    fontSize:
+                      textSize === "small"
+                        ? 12
+                        : textSize === "large"
+                          ? 16
+                          : 14,
+                  },
+                ]}
+              >
+                • {new Date(item.created_at).toLocaleDateString()}
+              </Text>
+            </View>
+          </View>
+        )}
+        ListHeaderComponent={
+          <>
+            {/* Header */}
+            <View style={styles.header}>
+              <View
+                style={[
+                  styles.avatarPlaceholder,
+                  { backgroundColor: colors.accentLight },
+                ]}
+              />
+              <Text
+                style={[
+                  styles.title,
+                  {
+                    color: colors.text,
+                    fontSize: sectionTitleFontSize,
+                  },
+                ]}
+              >
+                Favorites
+              </Text>
+              <TouchableOpacity>
+                <Ionicons name="search-outline" size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            {/* Your Collections */}
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text
+                  style={[
+                    styles.sectionTitle,
+                    {
+                      color: colors.text,
+                      fontSize: sectionTitleFontSize,
                     },
                   ]}
                 >
-                  New Collection
+                  Your Collections
                 </Text>
+                <TouchableOpacity>
+                  <Text style={[styles.seeAll, { color: colors.accent }]}>
+                    See all
+                  </Text>
+                </TouchableOpacity>
               </View>
-            </TouchableOpacity>
 
-            {/* Existing collections */}
-            {collections.map((collection) => (
-              <TouchableOpacity
-                key={collection.id}
+              <View style={styles.collectionsGrid}>
+                {/* Add new collection card */}
+                <TouchableOpacity
+                  style={[
+                    styles.collectionCard,
+                    styles.addCollectionCard,
+                    {
+                      backgroundColor: colors.surface,
+                      borderColor: colors.border,
+                      width: collectionCardWidth,
+                    },
+                  ]}
+                  onPress={handleCreateCollection}
+                  activeOpacity={0.8}
+                >
+                  <View style={styles.addCollectionContent}>
+                    <Ionicons name="add" size={32} color={colors.accent} />
+                    <Text
+                      style={[
+                        styles.addCollectionText,
+                        {
+                          color: colors.text,
+                          fontSize:
+                            textSize === "small"
+                              ? 14
+                              : textSize === "large"
+                                ? 18
+                                : 16,
+                        },
+                      ]}
+                    >
+                      New Collection
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+
+                {/* Existing collections */}
+                {collections.map((collection) => (
+                  <TouchableOpacity
+                    key={collection.id}
+                    style={[
+                      styles.collectionCard,
+                      {
+                        backgroundColor: colors.card,
+                        width: collectionCardWidth,
+                      },
+                    ]}
+                    activeOpacity={0.8}
+                  >
+                    <Image
+                      source={{
+                        uri: `https://images.unsplash.com/photo-${
+                          collection.id === 1
+                            ? "1506905925346-21bda4d32df4"
+                            : collection.id === 2
+                              ? "1514320291840-2e0a9bf29a9e"
+                              : collection.id === 3
+                                ? "1519681393784-d120267933ba"
+                                : "1486406146926-c627a92ad1ab"
+                        }?w=400`,
+                      }}
+                      style={styles.collectionImage}
+                      resizeMode="cover"
+                    />
+                    <View style={styles.collectionOverlay} />
+                    <View style={styles.collectionContent}>
+                      <Text
+                        style={[
+                          styles.collectionTitle,
+                          {
+                            color: "#FFFFFF",
+                            fontSize:
+                              textSize === "small"
+                                ? 14
+                                : textSize === "large"
+                                  ? 20
+                                  : 16,
+                          },
+                        ]}
+                      >
+                        {collection.title}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.collectionCount,
+                          {
+                            color: "#FFFFFF",
+                            opacity: 0.9,
+                            fontSize:
+                              textSize === "small"
+                                ? 12
+                                : textSize === "large"
+                                  ? 16
+                                  : 14,
+                          },
+                        ]}
+                      >
+                        0 Quotes
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.section}>
+              <Text
                 style={[
-                  styles.collectionCard,
+                  styles.sectionTitle,
                   {
-                    backgroundColor: colors.card,
-                    width: collectionCardWidth,
+                    color: colors.text,
+                    fontSize: sectionTitleFontSize,
+                    marginBottom: 16,
                   },
                 ]}
-                activeOpacity={0.8}
               >
-                <Image
-                  source={{
-                    uri: `https://images.unsplash.com/photo-${collection.id === 1 ? '1506905925346-21bda4d32df4' :
-                         collection.id === 2 ? '1514320291840-2e0a9bf29a9e' :
-                         collection.id === 3 ? '1519681393784-d120267933ba' :
-                         '1486406146926-c627a92ad1ab'}?w=400`
-                  }}
-                  style={styles.collectionImage}
-                  resizeMode="cover"
-                />
-                <View style={styles.collectionOverlay} />
-                <View style={styles.collectionContent}>
-                  <Text
-                    style={[
-                      styles.collectionTitle,
-                      {
-                        color: "#FFFFFF",
-                        fontSize:
-                          textSize === "small"
-                            ? 14
-                            : textSize === "large"
-                            ? 20
-                            : 16,
-                      },
-                    ]}
-                  >
-                    {collection.title}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.collectionCount,
-                      {
-                        color: "#FFFFFF",
-                        opacity: 0.9,
-                        fontSize:
-                          textSize === "small"
-                            ? 12
-                            : textSize === "large"
-                            ? 16
-                            : 14,
-                      },
-                    ]}
-                  >
-                    0 Quotes
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        {/* Favorite Quotes */}
-        <View style={styles.section}>
-          <Text
-            style={[
-              styles.sectionTitle,
-              {
-                color: colors.text,
-                fontSize: sectionTitleFontSize,
-                marginBottom: 16,
-              },
-            ]}
-          >
-            Favorite Quotes ({favoriteQuotes.length})
-          </Text>
-
-          {favoriteQuotes.length === 0 ? (
+                Favorite Quotes ({favoriteQuotes.length})
+              </Text>
+            </View>
+          </>
+        }
+        ListEmptyComponent={
+          <View style={styles.section}>
             <View style={styles.emptyState}>
-              <Ionicons name="heart-outline" size={48} color={colors.textSecondary} />
+              <Ionicons
+                name="heart-outline"
+                size={48}
+                color={colors.textSecondary}
+              />
               <Text
                 style={[
                   styles.emptyStateText,
                   {
                     color: colors.textSecondary,
-                    fontSize: textSize === "small" ? 14 : textSize === "large" ? 18 : 16,
+                    fontSize:
+                      textSize === "small"
+                        ? 14
+                        : textSize === "large"
+                          ? 18
+                          : 16,
                   },
                 ]}
               >
@@ -407,123 +523,35 @@ export default function LibraryScreen() {
                   styles.emptyStateSubtext,
                   {
                     color: colors.textSecondary,
-                    fontSize: textSize === "small" ? 12 : textSize === "large" ? 16 : 14,
+                    fontSize:
+                      textSize === "small"
+                        ? 12
+                        : textSize === "large"
+                          ? 16
+                          : 14,
                   },
                 ]}
               >
                 Tap the heart icon on quotes to save them here
               </Text>
             </View>
-          ) : (
-            <FlatList
-              data={favoriteQuotes}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => (
-                <View
-                  style={[
-                    styles.favoriteQuoteCard,
-                    {
-                      backgroundColor: colors.card,
-                      borderColor: colors.border,
-                    },
-                  ]}
-                >
-                  <View style={styles.favoriteQuoteHeader}>
-                    <View
-                      style={[
-                        styles.quoteIcon,
-                        {
-                          backgroundColor: colors.accent,
-                        },
-                      ]}
-                    >
-                      <Ionicons name="chatbubbles" size={24} color="#FFFFFF" />
-                    </View>
-                    <TouchableOpacity onPress={() => handleToggleFavorite(item.id)}>
-                      <Ionicons
-                        name="heart"
-                        size={24}
-                        color={
-                          favoritedQuoteIds.has(item.id)
-                            ? colors.accent
-                            : colors.textSecondary
-                        }
-                      />
-                    </TouchableOpacity>
-                  </View>
-                  <Text
-                    style={[
-                      styles.favoriteQuoteText,
-                      {
-                        color: colors.text,
-                        fontSize:
-                          textSize === "small"
-                            ? 16
-                            : textSize === "large"
-                            ? 22
-                            : 18,
-                      },
-                    ]}
-                  >
-                    {item.text}
-                  </Text>
-                  <View style={styles.favoriteQuoteFooter}>
-                    <Text
-                      style={[
-                        styles.favoriteQuoteAuthor,
-                        {
-                          color: colors.accent,
-                          fontSize:
-                            textSize === "small"
-                              ? 14
-                              : textSize === "large"
-                              ? 18
-                              : 16,
-                        },
-                      ]}
-                    >
-                      - {item.author || "Unknown"}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.favoriteQuoteDate,
-                        {
-                          color: colors.textSecondary,
-                          fontSize:
-                            textSize === "small"
-                              ? 12
-                              : textSize === "large"
-                              ? 16
-                              : 14,
-                        },
-                      ]}
-                    >
-                      • {new Date(item.created_at).toLocaleDateString()}
-                    </Text>
-                  </View>
-                </View>
-              )}
-              onEndReached={handleLoadMoreFavorites}
-              onEndReachedThreshold={0.5}
-              refreshControl={
-                <RefreshControl
-                  refreshing={isRefreshing}
-                  onRefresh={handleRefresh}
-                  tintColor={colors.accent}
-                />
-              }
-              ListFooterComponent={
-                isLoadingMore ? (
-                  <View style={styles.loadingMore}>
-                    <Text style={{ color: colors.textSecondary }}>Loading more favorites...</Text>
-                  </View>
-                ) : null
-              }
-              showsVerticalScrollIndicator={false}
-            />
-          )}
-        </View>
-      </ScrollView>
+          </View>
+        }
+        onEndReached={handleLoadMoreFavorites}
+        onEndReachedThreshold={0.5}
+        refreshing={isRefreshing}
+        onRefresh={handleRefresh}
+        ListFooterComponent={
+          isLoadingMore ? (
+            <View style={styles.loadingMore}>
+              <Text style={{ color: colors.textSecondary }}>
+                Loading more favorites...
+              </Text>
+            </View>
+          ) : null
+        }
+        showsVerticalScrollIndicator={false}
+      />
 
       {/* FAB */}
       <TouchableOpacity
@@ -563,8 +591,9 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   section: {
-    paddingHorizontal: 20,
+    // paddingHorizontal: 20,
     marginBottom: 32,
+    // backgroundColor: "#EDEDED",
   },
   sectionHeader: {
     flexDirection: "row",
@@ -584,6 +613,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
     gap: 16,
+    // backgroundColor: "#EDEDED",
   },
   collectionCard: {
     borderRadius: 16,
